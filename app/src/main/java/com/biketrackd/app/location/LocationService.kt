@@ -10,6 +10,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
@@ -20,8 +21,13 @@ class LocationService : Service() {
         getSystemService(LOCATION_SERVICE) as LocationManager
     }
 
-    private val listener = LocationListener { location: Location ->
-        LocationRepository.updateLocation(location)
+    private val listener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            LocationRepository.updateLocation(location)
+        }
+        override fun onProviderDisabled(provider: String) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) {}
     }
 
     override fun onCreate() {
@@ -73,7 +79,7 @@ class LocationService : Service() {
 
     private fun buildNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("GPS-OSS")
+            .setContentTitle("BikeTrackd")
             .setContentText("Rastreando posição...")
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setOngoing(true)

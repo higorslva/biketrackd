@@ -17,8 +17,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,6 +62,19 @@ fun StatusBar(
     val batteryIcon = if (isBatteryCharging) R.drawable.ic_battery_charging
     else batteryIconForLevel(batteryLevel)
 
+    val batteryBlinking = batteryLevel <= 15 && !isBatteryCharging
+    var batteryVisible by remember { mutableStateOf(true) }
+    LaunchedEffect(batteryBlinking) {
+        if (batteryBlinking) {
+            while (true) {
+                batteryVisible = !batteryVisible
+                kotlinx.coroutines.delay(500)
+            }
+        } else {
+            batteryVisible = true
+        }
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -69,7 +86,7 @@ fun StatusBar(
         Icon(
             painter = painterResource(batteryIcon),
             contentDescription = "Bateria",
-            tint = batteryColor,
+            tint = if (batteryVisible) batteryColor else Color.Transparent,
             modifier = Modifier.size(16.dp),
         )
 
@@ -93,13 +110,27 @@ fun StatusBar(
 
         Spacer(modifier = Modifier.width(4.dp))
 
+        val gpsBlinking = !locationState.hasFix
+        var dotVisible by remember { mutableStateOf(true) }
+        LaunchedEffect(gpsBlinking) {
+            if (gpsBlinking) {
+                while (true) {
+                    dotVisible = !dotVisible
+                    kotlinx.coroutines.delay(500)
+                }
+            } else {
+                dotVisible = true
+            }
+        }
+        val dotColor = when {
+            locationState.hasFix -> GpsFix
+            dotVisible -> GpsNoFix
+            else -> Color.Transparent
+        }
         Box(
             modifier = Modifier
                 .size(12.dp)
-                .background(
-                    color = if (locationState.hasFix) GpsFix else GpsNoFix,
-                    shape = CircleShape,
-                ),
+                .background(color = dotColor, shape = CircleShape),
             content = {},
         )
 

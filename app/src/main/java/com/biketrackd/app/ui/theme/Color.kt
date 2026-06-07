@@ -26,3 +26,12 @@ val BatteryLow = Color(0xFFF44336)
 
 val GpsFix = Color(0xFF4CAF50)
 val GpsNoFix = Color(0xFFF44336)
+val GpsWeak = Color(0xFFFFC107)
+
+val WarningAmber = Color(0xFFFFC107)
+val WarningRed = Color(0xFFF44336)
+
+val ArcTrack = Color(0xFF2A2A2A)
+val Cyan = Color(0xFF00BCD4)
+val CompassGreen = Color(0xFF4CAF50)
+val CompassRed = Color(0xFFF44336)

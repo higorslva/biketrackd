@@ -13,3 +13,13 @@ data class PedalSession(
     val durationSeconds: Long,
     val trailData: String? = null,
 )
+
+data class WeekDist(
+    val week: String,
+    val dist: Float,
+)
+
+data class MonthDist(
+    val month: String,
+    val dist: Float,
+)

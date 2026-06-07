@@ -17,9 +17,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -35,6 +36,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.PedalSession
+import com.biketrackd.app.location.DeviceThermalManager
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.location.LocationService
 import com.biketrackd.app.location.SessionSummary
@@ -62,15 +64,15 @@ class MainActivity : ComponentActivity() {
             isBatteryCharging = intent.getIntExtra(
                 BatteryManager.EXTRA_STATUS, -1
             ) == BatteryManager.BATTERY_STATUS_CHARGING
+            DeviceThermalManager.onBatteryChanged(intent)
         }
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val allGranted = permissions.values.all { it }
-        if (allGranted) {
-            startGpsService()
+        if (permissions.values.all { it }) {
+            // Permissão concedida — onStart() iniciará o service
         } else {
             Toast.makeText(this, "Permissão GPS necessária", Toast.LENGTH_LONG).show()
         }
@@ -80,10 +82,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         org.osmdroid.config.Configuration.getInstance().apply {
-            userAgentValue = "GPS-OSS/1.0"
+            userAgentValue = "BikeTrackd/1.0"
             osmdroidBasePath = cacheDir
             osmdroidTileCache = cacheDir
         }
+
+        LocationRepository.init(this)
+        DeviceThermalManager.init(this)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -98,23 +103,22 @@ class MainActivity : ComponentActivity() {
                 val scope = rememberCoroutineScope()
 
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Box(modifier = Modifier.weight(1f).fillMaxSize()) {
-                        when (currentScreen) {
-                            Screen.GPS -> GpsScreen()
-                            Screen.SPEEDOMETER -> SpeedometerScreen(
-                                batteryLevel = batteryLevel,
-                                isBatteryCharging = isBatteryCharging,
-                                modifier = Modifier.padding(start = 80.dp)
-                            )
-                            Screen.SETTINGS -> SettingsScreen(
-                                modifier = Modifier.padding(start = 80.dp)
-                            )
-                        }
-
+                    Row(modifier = Modifier.weight(1f)) {
                         Sidebar(
                             currentScreen = currentScreen,
                             onScreenSelected = { currentScreen = it },
                         )
+
+                        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                            when (currentScreen) {
+                                Screen.GPS -> GpsScreen()
+                                Screen.SPEEDOMETER -> SpeedometerScreen(
+                                    batteryLevel = batteryLevel,
+                                    isBatteryCharging = isBatteryCharging,
+                                )
+                                Screen.SETTINGS -> SettingsScreen()
+                            }
+                        }
                     }
 
                     if (currentScreen == Screen.GPS) {
@@ -158,6 +162,7 @@ class MainActivity : ComponentActivity() {
                                             )
                                         )
                                 }
+                                LocationRepository.addToTotalOdometer(summary.totalDistance)
                                 LocationRepository.resetSession()
                                 pendingSession = null
                             }) { Text("Salvar") }
@@ -174,14 +179,33 @@ class MainActivity : ComponentActivity() {
         }
 
         enableImmersiveMode()
-        checkPermissionsAndStart()
+        requestPermissions()
         observeLocationForWeather()
         registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (hasLocationPermission()) {
+            startGpsService()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        LocationService.stop(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(batteryReceiver)
+        DeviceThermalManager.stop()
+    }
+
     private fun enableImmersiveMode() {
+        val decorView = window.decorView
         @Suppress("DEPRECATION")
-        window.decorView.systemUiVisibility = (
+        decorView.systemUiVisibility = (
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -189,9 +213,25 @@ class MainActivity : ComponentActivity() {
             or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         )
+
+        decorView.setOnSystemUiVisibilityChangeListener { visibility ->
+            if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
+                decorView.postDelayed({
+                    @Suppress("DEPRECATION")
+                    decorView.systemUiVisibility = (
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    )
+                }, 100)
+            }
+        }
     }
 
-    private fun checkPermissionsAndStart() {
+    private fun requestPermissions() {
         val permissions = mutableListOf(Manifest.permission.ACCESS_FINE_LOCATION)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissions.add(Manifest.permission.POST_NOTIFICATIONS)
@@ -201,15 +241,20 @@ class MainActivity : ComponentActivity() {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
 
-        if (missing.isEmpty()) {
-            startGpsService()
-        } else {
+        if (missing.isNotEmpty()) {
             requestPermissionLauncher.launch(missing.toTypedArray())
         }
     }
 
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
     private fun startGpsService() {
         LocationService.start(this)
+        DeviceThermalManager.start()
     }
 
     private fun observeLocationForWeather() {
@@ -222,14 +267,6 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(batteryReceiver)
-        if (isFinishing) {
-            LocationService.stop(this)
         }
     }
 }

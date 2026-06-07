@@ -1,6 +1,8 @@
 package com.biketrackd.app.ui.screens
 
 import android.graphics.Color
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.biketrackd.app.R
@@ -66,13 +69,14 @@ fun GpsScreen() {
 
     val trailPoints = LocationRepository.trailPoints
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().graphicsLayer { clip = true }) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { ctx ->
                 MapView(ctx).apply {
                     setTileSource(openTopoSource)
                     setMultiTouchControls(true)
+                    setTilesScaleFactor(1.3f)
                     controller.setZoom(17.0)
 
                     val polyline = Polyline().apply {
@@ -87,8 +91,16 @@ fun GpsScreen() {
                         setIcon(ctx.getDrawable(R.drawable.ic_location_pin))
                     }
 
+                    val originMarker = Marker(this).apply {
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        title = "Origem"
+                        setIcon(ctx.getDrawable(R.drawable.ic_origin_marker))
+                        setVisible(false)
+                    }
+
                     overlays.add(polyline)
                     overlays.add(marker)
+                    overlays.add(originMarker)
 
                     val eventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
                         override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
@@ -104,7 +116,7 @@ fun GpsScreen() {
                         overlays.add(this)
                     }
 
-                    setTag(SimpleMapState(polyline, marker))
+                    setTag(SimpleMapState(polyline, marker, originMarker))
 
                     mapViewRef = this
                 }
@@ -113,8 +125,16 @@ fun GpsScreen() {
                 val mapState = mapView.tag as? SimpleMapState ?: return@AndroidView
                 val polyline = mapState.polyline
                 val marker = mapState.marker
+                val originMarker = mapState.originMarker
 
                 polyline.setPoints(ArrayList(trailPoints.map { GeoPoint(it.first, it.second) }))
+
+                if (state.hasOrigin) {
+                    originMarker.position = GeoPoint(state.originLatitude, state.originLongitude)
+                    originMarker.setVisible(true)
+                } else {
+                    originMarker.setVisible(false)
+                }
 
                 if (state.hasFix) {
                     val currentPoint = GeoPoint(state.latitude, state.longitude)
@@ -127,7 +147,7 @@ fun GpsScreen() {
                         } else {
                             mapView.controller.animateTo(currentPoint)
                         }
-                        if (state.bearing > 0f) {
+                        if (state.rawSpeedKmh >= 3f && state.bearing > 0f) {
                             mapView.setMapOrientation(state.bearing, true)
                         }
                     }
@@ -157,6 +177,23 @@ fun GpsScreen() {
             Text(
                 text = if (followMode) "SEGUINDO" else "SEGUIR",
                 style = MaterialTheme.typography.labelLarge,
+            )
+        }
+
+        if (state.hasOrigin) {
+            Text(
+                text = "↩ ${String.format("%.2f", state.distanceToOrigin / 1000f)} km",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(12.dp)
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
+                        shape = RoundedCornerShape(8.dp),
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
             )
         }
 
@@ -245,4 +282,5 @@ fun GpsScreen() {
 private class SimpleMapState(
     val polyline: Polyline,
     val marker: Marker,
+    val originMarker: Marker,
 )
