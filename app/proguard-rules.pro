@@ -1,0 +1,3 @@
+-keep class org.osmdroid.** { *; }
+-keep class org.osmdroid.tileprovider.** { *; }
+-keep class androidx.room.** { *; }
