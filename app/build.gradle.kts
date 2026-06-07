@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,6 +21,22 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    val keystorePropsFile = rootProject.file("biketrackd.properties")
+    val keystoreProps = if (keystorePropsFile.exists()) {
+        Properties().apply {
+            load(FileInputStream(keystorePropsFile))
+        }
+    } else null
+
+    signingConfigs {
+        create("release") {
+            storeFile = rootProject.file("biketrackd.keystore")
+            storePassword = keystoreProps?.getProperty("storePassword") ?: ""
+            keyAlias = "biketrackd"
+            keyPassword = keystoreProps?.getProperty("keyPassword") ?: ""
+        }
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = false
@@ -28,6 +47,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 

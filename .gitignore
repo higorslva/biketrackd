@@ -13,3 +13,5 @@ captures/
 *.apk
 *.aab
 *.ap_
+*.keystore
+biketrackd.properties
