@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -201,6 +203,7 @@ fun SpeedometerScreen(
                     },
                     label = "BAT",
                     blinking = batteryLevel <= 15,
+                    isCritical = batteryLevel <= 15,
                 )
                 WarningLight(
                     color = if (showGearWarning) WarningAmber else SpeedLow,
@@ -214,6 +217,7 @@ fun SpeedometerScreen(
                     },
                     label = "GPS",
                     blinking = !state.hasFix,
+                    isCritical = !state.hasFix,
                 )
                 WarningLight(
                     color = when (thermalLevel) {
@@ -223,6 +227,9 @@ fun SpeedometerScreen(
                     },
                     label = "TMP",
                     blinking = thermalLevel in listOf(
+                        ThermalLevel.MODERATE, ThermalLevel.HOT, ThermalLevel.CRITICAL
+                    ),
+                    isCritical = thermalLevel in listOf(
                         ThermalLevel.MODERATE, ThermalLevel.HOT, ThermalLevel.CRITICAL
                     ),
                 )
@@ -404,6 +411,7 @@ private fun WarningLight(
     color: Color,
     label: String,
     blinking: Boolean = false,
+    isCritical: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     var visible by remember { mutableStateOf(true) }
@@ -422,11 +430,20 @@ private fun WarningLight(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        Canvas(modifier = Modifier.size(10.dp)) {
-            drawCircle(
-                color = if (visible) color else Color.Transparent,
-                radius = size.width / 2f,
+        if (isCritical) {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = label,
+                tint = if (visible) color else Color.Transparent,
+                modifier = Modifier.size(12.dp),
             )
+        } else {
+            Canvas(modifier = Modifier.size(10.dp)) {
+                drawCircle(
+                    color = if (visible) color else Color.Transparent,
+                    radius = size.width / 2f,
+                )
+            }
         }
         Text(
             text = label,

@@ -187,8 +187,8 @@ fun GpsScreen() {
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(12.dp)
+                    .align(Alignment.TopEnd)
+                    .padding(top = 56.dp, end = 12.dp)
                     .background(
                         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
                         shape = RoundedCornerShape(8.dp),

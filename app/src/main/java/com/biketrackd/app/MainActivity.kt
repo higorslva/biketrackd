@@ -10,19 +10,33 @@ import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
@@ -30,7 +44,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -47,6 +63,7 @@ import com.biketrackd.app.ui.screens.GpsScreen
 import com.biketrackd.app.ui.screens.SettingsScreen
 import com.biketrackd.app.ui.screens.SpeedometerScreen
 import com.biketrackd.app.ui.theme.GpsOssTheme
+import com.biketrackd.app.ui.theme.TextPrimary
 import com.biketrackd.app.weather.WeatherRepository
 import kotlinx.coroutines.launch
 
@@ -100,36 +117,77 @@ class MainActivity : ComponentActivity() {
                 var pendingSession by androidx.compose.runtime.remember {
                     mutableStateOf<SessionSummary?>(null)
                 }
+                var showSidebar by androidx.compose.runtime.remember {
+                    mutableStateOf(false)
+                }
                 val scope = rememberCoroutineScope()
 
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Row(modifier = Modifier.weight(1f)) {
-                        Sidebar(
-                            currentScreen = currentScreen,
-                            onScreenSelected = { currentScreen = it },
-                        )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Row(modifier = Modifier.weight(1f)) {
+                            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                                when (currentScreen) {
+                                    Screen.GPS -> GpsScreen()
+                                    Screen.SPEEDOMETER -> SpeedometerScreen(
+                                        batteryLevel = batteryLevel,
+                                        isBatteryCharging = isBatteryCharging,
+                                    )
+                                    Screen.SETTINGS -> SettingsScreen()
+                                }
 
-                        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                            when (currentScreen) {
-                                Screen.GPS -> GpsScreen()
-                                Screen.SPEEDOMETER -> SpeedometerScreen(
-                                    batteryLevel = batteryLevel,
-                                    isBatteryCharging = isBatteryCharging,
-                                )
-                                Screen.SETTINGS -> SettingsScreen()
+                                Button(
+                                    onClick = { showSidebar = !showSidebar },
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
+                                        contentColor = TextPrimary,
+                                    ),
+                                    modifier = Modifier
+                                        .align(Alignment.TopStart)
+                                        .padding(8.dp),
+                                ) {
+                                    Icon(
+                                        imageVector = if (showSidebar) Icons.Default.Close
+                                            else Icons.Default.Menu,
+                                        contentDescription = if (showSidebar) "Fechar" else "Menu",
+                                    )
+                                }
                             }
+                        }
+
+                        if (currentScreen == Screen.GPS) {
+                            StatusBar(
+                                batteryLevel = batteryLevel,
+                                isBatteryCharging = isBatteryCharging,
+                                onStartSession = { LocationRepository.startSession() },
+                                onStopSession = {
+                                    pendingSession = LocationRepository.stopSession()
+                                },
+                            )
                         }
                     }
 
-                    if (currentScreen == Screen.GPS) {
-                        StatusBar(
-                            batteryLevel = batteryLevel,
-                            isBatteryCharging = isBatteryCharging,
-                            onStartSession = { LocationRepository.startSession() },
-                            onStopSession = {
-                                pendingSession = LocationRepository.stopSession()
-                            },
-                        )
+                    AnimatedVisibility(
+                        visible = showSidebar,
+                        enter = slideInHorizontally { -it },
+                        exit = slideOutHorizontally { -it },
+                    ) {
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            Sidebar(
+                                currentScreen = currentScreen,
+                                onScreenSelected = { screen ->
+                                    currentScreen = screen
+                                    showSidebar = false
+                                },
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    .background(Color.Black.copy(alpha = 0.4f))
+                                    .clickable { showSidebar = false },
+                            )
+                        }
                     }
                 }
 
@@ -204,29 +262,41 @@ class MainActivity : ComponentActivity() {
 
     private fun enableImmersiveMode() {
         val decorView = window.decorView
-        @Suppress("DEPRECATION")
-        decorView.systemUiVisibility = (
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            or View.SYSTEM_UI_FLAG_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false)
+            window.insetsController?.apply {
+                hide(
+                    WindowInsets.Type.statusBars()
+                        or WindowInsets.Type.navigationBars()
+                )
+                systemBarsBehavior =
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            )
 
-        decorView.setOnSystemUiVisibilityChangeListener { visibility ->
-            if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
-                decorView.postDelayed({
-                    @Suppress("DEPRECATION")
-                    decorView.systemUiVisibility = (
-                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        or View.SYSTEM_UI_FLAG_FULLSCREEN
-                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    )
-                }, 100)
+            decorView.setOnSystemUiVisibilityChangeListener { visibility ->
+                if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
+                    decorView.postDelayed({
+                        @Suppress("DEPRECATION")
+                        decorView.systemUiVisibility = (
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            or View.SYSTEM_UI_FLAG_FULLSCREEN
+                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        )
+                    }, 100)
+                }
             }
         }
     }
