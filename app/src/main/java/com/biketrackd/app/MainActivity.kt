@@ -66,6 +66,7 @@ import com.biketrackd.app.ui.theme.GpsOssTheme
 import com.biketrackd.app.ui.theme.TextPrimary
 import com.biketrackd.app.weather.WeatherRepository
 import kotlinx.coroutines.launch
+import org.maplibre.android.MapLibre
 
 class MainActivity : ComponentActivity() {
 
@@ -98,11 +99,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        org.osmdroid.config.Configuration.getInstance().apply {
-            userAgentValue = "BikeTrackd/1.0"
-            osmdroidBasePath = cacheDir
-            osmdroidTileCache = cacheDir
-        }
+        MapLibre.getInstance(this)
 
         LocationRepository.init(this)
         DeviceThermalManager.init(this)

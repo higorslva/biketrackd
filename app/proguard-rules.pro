@@ -1,3 +1,4 @@
--keep class org.osmdroid.** { *; }
--keep class org.osmdroid.tileprovider.** { *; }
+-keep class org.maplibre.android.** { *; }
+-dontwarn org.maplibre.android.**
+-dontwarn com.mapbox.**
 -keep class androidx.room.** { *; }

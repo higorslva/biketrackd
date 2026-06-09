@@ -1,6 +1,7 @@
 package com.biketrackd.app.data
 
 data class OfflineMapInfo(
+    val id: Long,
     val name: String,
     val fileName: String,
     val fileSizeBytes: Long,

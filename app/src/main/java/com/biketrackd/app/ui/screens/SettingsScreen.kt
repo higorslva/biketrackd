@@ -49,15 +49,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.GpxExporter
+import com.biketrackd.app.data.MapOfflineManager
 import com.biketrackd.app.data.OfflineMapInfo
 import com.biketrackd.app.data.OfflineMapManager
 import com.biketrackd.app.data.PedalSession
-import com.biketrackd.app.data.TileDownloader
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.ui.components.CityResult
 import com.biketrackd.app.ui.components.CitySearchDialog
 import com.biketrackd.app.ui.components.DownloadDialog
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -70,10 +72,17 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val dao = rememberDao(context)
 
     val sessions by dao.getAllFlow().collectAsState(initial = emptyList())
-    val downloadProgress by TileDownloader.progress.collectAsState()
+    val downloadProgress by MapOfflineManager.progress.collectAsState()
 
     var refreshTrigger by remember { mutableStateOf(0) }
     var showCitySearch by remember { mutableStateOf(false) }
+    var offlineMaps by remember { mutableStateOf<List<OfflineMapInfo>>(emptyList()) }
+
+    androidx.compose.runtime.LaunchedEffect(refreshTrigger) {
+        offlineMaps = withContext(Dispatchers.Main) {
+            OfflineMapManager.listMaps(context)
+        }
+    }
 
     val sessionCount by dao.getSessionCountFlow().collectAsState(initial = 0)
     val totalDist by dao.getTotalDistanceFlow().collectAsState(initial = 0f)
@@ -88,8 +97,6 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val timestamps by dao.getAllTimestamps().collectAsState(initial = emptyList())
 
     var showWeekly by remember { mutableStateOf(true) }
-
-    val offlineMaps = remember(refreshTrigger) { OfflineMapManager.listMaps(context) }
 
     LazyColumn(
         modifier = modifier
@@ -464,12 +471,14 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 )
             }
         } else {
-            items(offlineMaps, key = { it.fileName }) { map ->
+            items(offlineMaps, key = { it.id }) { map ->
                 OfflineMapCard(
                     map = map,
                     onDelete = {
-                        OfflineMapManager.deleteMap(context, map.fileName)
-                        refreshTrigger++
+                        scope.launch {
+                            OfflineMapManager.deleteMap(context, map.id)
+                            refreshTrigger++
+                        }
                     },
                 )
             }
@@ -548,7 +557,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     DownloadDialog(
         progress = downloadProgress,
         onDismiss = {
-            TileDownloader.resetProgress()
+            MapOfflineManager.resetProgress()
             refreshTrigger++
         },
     )
@@ -700,7 +709,7 @@ private fun downloadMapForCity(
     city: CityResult,
 ) {
     scope.launch {
-        TileDownloader.download(
+        MapOfflineManager.download(
             context = context,
             name = city.displayName.split(",").first().trim(),
             centerLat = city.lat,

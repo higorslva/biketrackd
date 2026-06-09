@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.biketrackd.app.data.DownloadProgress
+import com.biketrackd.app.data.DownloadProgress.Status
 
 @Composable
 fun DownloadDialog(
@@ -40,13 +41,17 @@ fun DownloadDialog(
             Column(modifier = Modifier.fillMaxWidth()) {
                 when (progress.status) {
                     DownloadProgress.Status.Downloading -> {
+                        val totalText = if (progress.total > 0)
+                            "${progress.current} de ${progress.total} recursos"
+                        else
+                            "${progress.current} recursos baixados..."
                         Text(
-                            text = "Zoom ${progress.zoom} — ${progress.current} de ${progress.total} tiles",
+                            text = totalText,
                             style = MaterialTheme.typography.bodySmall,
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         LinearProgressIndicator(
-                            progress = { progress.fraction },
+                            progress = { if (progress.total > 0) progress.fraction else 0f },
                             modifier = Modifier.fillMaxWidth(),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -57,7 +62,7 @@ fun DownloadDialog(
                         )
                     }
                     DownloadProgress.Status.Completed -> {
-                        Text("${progress.total} tiles baixados com sucesso.")
+                        Text("${progress.total} recursos baixados com sucesso.")
                     }
                     DownloadProgress.Status.Error -> {
                         Text(

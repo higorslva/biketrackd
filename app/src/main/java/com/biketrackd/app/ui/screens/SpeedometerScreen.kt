@@ -3,6 +3,7 @@ package com.biketrackd.app.ui.screens
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
@@ -153,6 +155,20 @@ fun SpeedometerScreen(
                 )
             }
 
+            Column(
+                Modifier.weight(1f).fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                DataValue(
+                    label = "MÁX",
+                    value = if (state.hasFix)
+                        String.format("%.0f", state.maxSpeedKmh) else "--",
+                    unit = "km/h",
+                    valueSize = 20,
+                )
+            }
+
             // Weather
             Column(
                 Modifier.weight(1f).fillMaxWidth(),
@@ -265,12 +281,15 @@ fun SpeedometerScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+            Box(
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                contentAlignment = Alignment.Center,
             ) {
-                DataValue(label = "MÁX", value = if (state.hasFix)
-                    String.format("%.0f", state.maxSpeedKmh) else "--", unit = "km/h", valueSize = 20)
                 Text(
                     text = time,
                     style = MaterialTheme.typography.titleLarge,
