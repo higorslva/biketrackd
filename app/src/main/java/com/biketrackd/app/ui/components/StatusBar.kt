@@ -52,15 +52,12 @@ fun StatusBar(
     val weather by WeatherRepository.weather.collectAsState()
 
     val batteryColor = when {
-        isBatteryCharging -> BatteryGood
         batteryLevel <= 15 -> BatteryLow
         batteryLevel <= 40 -> BatteryMedium
         else -> BatteryGood
     }
 
     val batteryText = if (batteryLevel < 0) "--%" else "$batteryLevel%"
-    val batteryIcon = if (isBatteryCharging) R.drawable.ic_battery_charging
-    else batteryIconForLevel(batteryLevel)
 
     val batteryBlinking = batteryLevel <= 15 && !isBatteryCharging
     var batteryVisible by remember { mutableStateOf(true) }
@@ -84,11 +81,20 @@ fun StatusBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            painter = painterResource(batteryIcon),
+            painter = painterResource(batteryIconForLevel(batteryLevel)),
             contentDescription = "Bateria",
             tint = if (batteryVisible) batteryColor else Color.Transparent,
             modifier = Modifier.size(16.dp),
         )
+        if (isBatteryCharging) {
+            Text(
+                text = "\u26A1",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(start = 2.dp),
+            )
+        }
 
         Spacer(modifier = Modifier.width(6.dp))
 

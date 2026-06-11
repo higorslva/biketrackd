@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -53,6 +54,7 @@ import com.biketrackd.app.data.MapOfflineManager
 import com.biketrackd.app.data.OfflineMapInfo
 import com.biketrackd.app.data.OfflineMapManager
 import com.biketrackd.app.data.PedalSession
+import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.ui.components.CityResult
 import com.biketrackd.app.ui.components.CitySearchDialog
@@ -441,6 +443,89 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text("100", style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        }
+
+        // === Speed limit warning section ===
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+
+        item {
+            val limitEnabled = remember { mutableStateOf(SpeedLimitPreferences.isEnabled(context)) }
+            val limitValue = remember { mutableStateOf(SpeedLimitPreferences.getLimit(context).toFloat()) }
+
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "\uD83D\uDEB2 Limite de Ciclovia",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "Ativar aviso",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Switch(
+                            checked = limitEnabled.value,
+                            onCheckedChange = { checked ->
+                                limitEnabled.value = checked
+                                SpeedLimitPreferences.setEnabled(context, checked)
+                            },
+                        )
+                    }
+                    if (limitEnabled.value) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = "Limite",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = "${String.format("%.0f", limitValue.value)} km/h",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Slider(
+                            value = limitValue.value,
+                            onValueChange = { newValue ->
+                                limitValue.value = newValue
+                                SpeedLimitPreferences.setLimit(context, newValue.toInt())
+                            },
+                            valueRange = 10f..60f,
+                            steps = 9,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text("10", style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("60", style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
                 }
             }

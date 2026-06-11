@@ -43,7 +43,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import com.biketrackd.app.R
+import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.location.DeviceThermalManager
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.location.ThermalLevel
@@ -83,7 +85,13 @@ fun SpeedometerScreen(
         label = "speed",
     )
 
+    val ctx = LocalContext.current
+    val speedLimitEnabled = SpeedLimitPreferences.isEnabled(ctx)
+    val speedLimit = SpeedLimitPreferences.getLimit(ctx)
+    val speedLimitExceeded = speedLimitEnabled && state.hasFix && animatedSpeed > speedLimit
+
     val speedColor = when {
+        speedLimitExceeded -> WarningRed
         !state.hasFix -> TextSecondary
         animatedSpeed < 30f -> SpeedLow
         animatedSpeed < 50f -> SpeedMedium
@@ -96,7 +104,9 @@ fun SpeedometerScreen(
         batteryLevel <= 40 -> WarningAmber
         else -> SpeedLow
     }
-    val batteryText = if (batteryLevel < 0) "--%" else "$batteryLevel%"
+    val batteryText = if (batteryLevel < 0) "--%"
+        else if (isBatteryCharging) "$batteryLevel% \u26A1"
+        else "$batteryLevel%"
 
     val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
     val elapsedHms = formatElapsed(state.elapsedSeconds)
@@ -276,6 +286,14 @@ fun SpeedometerScreen(
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    if (speedLimitExceeded) {
+                        Text(
+                            text = "\u26A0 CICLOVIA $speedLimit km/h",
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = WarningRed,
+                        )
+                    }
                 }
             }
 
