@@ -33,9 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.biketrackd.app.R
 import com.biketrackd.app.location.LocationRepository
-import com.biketrackd.app.ui.theme.BatteryGood
-import com.biketrackd.app.ui.theme.BatteryLow
-import com.biketrackd.app.ui.theme.BatteryMedium
 import com.biketrackd.app.ui.theme.GpsFix
 import com.biketrackd.app.ui.theme.GpsNoFix
 import com.biketrackd.app.weather.WeatherRepository
@@ -50,12 +47,6 @@ fun StatusBar(
 ) {
     val locationState by LocationRepository.state.collectAsState()
     val weather by WeatherRepository.weather.collectAsState()
-
-    val batteryColor = when {
-        batteryLevel <= 15 -> BatteryLow
-        batteryLevel <= 40 -> BatteryMedium
-        else -> BatteryGood
-    }
 
     val batteryText = if (batteryLevel < 0) "--%" else "$batteryLevel%"
 
@@ -72,6 +63,17 @@ fun StatusBar(
         }
     }
 
+    val batteryIcon = when {
+        isBatteryCharging -> R.drawable.ic_battery_charging
+        batteryLevel <= 15 -> R.drawable.ic_battery_0
+        batteryLevel <= 40 -> R.drawable.ic_battery_25
+        batteryLevel <= 65 -> R.drawable.ic_battery_50
+        batteryLevel <= 87 -> R.drawable.ic_battery_75
+        else -> R.drawable.ic_battery_100
+    }
+    val currentIcon = if (batteryBlinking && !batteryVisible)
+        R.drawable.ic_battery_outline else batteryIcon
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -81,20 +83,11 @@ fun StatusBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            painter = painterResource(batteryIconForLevel(batteryLevel)),
+            painter = painterResource(currentIcon),
             contentDescription = "Bateria",
-            tint = if (batteryVisible) batteryColor else Color.Transparent,
+            tint = Color.Unspecified,
             modifier = Modifier.size(16.dp),
         )
-        if (isBatteryCharging) {
-            Text(
-                text = "\u26A1",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(start = 2.dp),
-            )
-        }
 
         Spacer(modifier = Modifier.width(6.dp))
 
@@ -231,13 +224,7 @@ fun StatusBar(
     }
 }
 
-private fun batteryIconForLevel(pct: Int): Int = when {
-    pct <= 0 -> R.drawable.ic_battery_0
-    pct <= 25 -> R.drawable.ic_battery_25
-    pct <= 50 -> R.drawable.ic_battery_50
-    pct <= 75 -> R.drawable.ic_battery_75
-    else -> R.drawable.ic_battery_100
-}
+
 
 @Composable
 private fun weatherIconPainter(code: Int): Painter = when (code) {

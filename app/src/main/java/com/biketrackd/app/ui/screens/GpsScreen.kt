@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,19 +81,42 @@ fun GpsScreen() {
 
     val trailPoints = LocationRepository.trailPoints
 
+    LaunchedEffect(mapStateRef) {
+        val ms = mapStateRef ?: return@LaunchedEffect
+        val coords = trailPoints.map { Point.fromLngLat(it.second, it.first) }
+        val trailLineString = if (coords.isNotEmpty()) LineString.fromLngLats(coords) else null
+        if (trailLineString != null) {
+            ms.style.getSourceAs<GeoJsonSource>("trail")?.setGeoJson(
+                Feature.fromGeometry(trailLineString),
+            )
+        } else {
+            ms.style.getSourceAs<GeoJsonSource>("trail")?.setGeoJson(
+                org.maplibre.geojson.FeatureCollection.fromFeatures(emptyList()),
+            )
+        }
+    }
+
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
+                Lifecycle.Event.ON_CREATE -> mapViewRef?.onCreate(null)
                 Lifecycle.Event.ON_START -> mapViewRef?.onStart()
                 Lifecycle.Event.ON_RESUME -> mapViewRef?.onResume()
                 Lifecycle.Event.ON_PAUSE -> mapViewRef?.onPause()
                 Lifecycle.Event.ON_STOP -> mapViewRef?.onStop()
-                Lifecycle.Event.ON_DESTROY -> mapViewRef?.onDestroy()
+                Lifecycle.Event.ON_DESTROY -> {
+                    mapViewRef?.onDestroy()
+                    mapViewRef = null
+                }
                 else -> {}
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            mapViewRef?.onDestroy()
+            mapViewRef = null
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize().graphicsLayer { clip = true }) {
@@ -101,6 +125,13 @@ fun GpsScreen() {
             factory = { ctx ->
                 MapView(ctx).apply {
                     mapViewRef = this
+
+                    // catch up on lifecycle events
+                    val currentState = lifecycleOwner.lifecycle.currentState
+                    if (currentState.isAtLeast(Lifecycle.State.CREATED)) onCreate(null)
+                    if (currentState.isAtLeast(Lifecycle.State.STARTED)) onStart()
+                    if (currentState.isAtLeast(Lifecycle.State.RESUMED)) onResume()
+
                     getMapAsync { map ->
                         map.uiSettings.apply {
                             isAttributionEnabled = false
@@ -156,7 +187,6 @@ fun GpsScreen() {
             },
             update = { _ ->
                 val ms = mapStateRef ?: return@AndroidView
-                if (!ms.style.isFullyLoaded) return@AndroidView
                 val style = ms.style
 
                 val trailLineString = run {
@@ -166,6 +196,10 @@ fun GpsScreen() {
                 if (trailLineString != null) {
                     style.getSourceAs<GeoJsonSource>("trail")?.setGeoJson(
                         Feature.fromGeometry(trailLineString),
+                    )
+                } else {
+                    style.getSourceAs<GeoJsonSource>("trail")?.setGeoJson(
+                        org.maplibre.geojson.FeatureCollection.fromFeatures(emptyList()),
                     )
                 }
 

@@ -90,11 +90,13 @@ fun SpeedometerScreen(
     val speedLimit = SpeedLimitPreferences.getLimit(ctx)
     val speedLimitExceeded = speedLimitEnabled && state.hasFix && animatedSpeed > speedLimit
 
+    val speedProgress = if (state.hasFix && maxSpeedArc > 0f)
+        (animatedSpeed / maxSpeedArc).coerceIn(0f, 1f) else 0f
     val speedColor = when {
         speedLimitExceeded -> WarningRed
         !state.hasFix -> TextSecondary
-        animatedSpeed < 30f -> SpeedLow
-        animatedSpeed < 50f -> SpeedMedium
+        speedProgress < 0.4f -> SpeedLow
+        speedProgress < 0.7f -> SpeedMedium
         else -> SpeedHigh
     }
 
@@ -104,9 +106,7 @@ fun SpeedometerScreen(
         batteryLevel <= 40 -> WarningAmber
         else -> SpeedLow
     }
-    val batteryText = if (batteryLevel < 0) "--%"
-        else if (isBatteryCharging) "$batteryLevel% \u26A1"
-        else "$batteryLevel%"
+    val batteryText = if (batteryLevel < 0) "--%" else "$batteryLevel%"
 
     val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
     val elapsedHms = formatElapsed(state.elapsedSeconds)
@@ -270,6 +270,7 @@ fun SpeedometerScreen(
                     speed = animatedSpeed,
                     hasFix = state.hasFix,
                     maxSpeedArc = maxSpeedArc,
+                    speedColor = speedColor,
                     modifier = Modifier.fillMaxSize(),
                 )
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -376,12 +377,26 @@ fun SpeedometerScreen(
                         .height(20.dp),
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = batteryText,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = batteryColor,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = batteryText,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = batteryColor,
+                    )
+                    if (isBatteryCharging) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_bolt),
+                            contentDescription = "Carregando",
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(start = 4.dp),
+                        )
+                    }
+                }
             }
         }
     }
@@ -394,6 +409,7 @@ private fun SpeedometerArc(
     speed: Float,
     hasFix: Boolean,
     maxSpeedArc: Float,
+    speedColor: Color,
     modifier: Modifier = Modifier,
 ) {
     val progress = if (hasFix) (speed / maxSpeedArc).coerceIn(0f, 1f) else 0f
@@ -420,18 +436,12 @@ private fun SpeedometerArc(
             style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
         )
 
-        // Active arc with gradient
+        // Active arc
         if (animatedProgress > 0.001f) {
             val sweepAngle = ARC_SWEEP * animatedProgress
 
-            val arcColor = when {
-                animatedProgress < 0.4f -> SpeedLow
-                animatedProgress < 0.7f -> SpeedMedium
-                else -> SpeedHigh
-            }
-
             drawArc(
-                color = arcColor,
+                color = speedColor,
                 startAngle = ARC_START,
                 sweepAngle = sweepAngle,
                 useCenter = false,
