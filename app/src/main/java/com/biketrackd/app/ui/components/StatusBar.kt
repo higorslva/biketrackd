@@ -27,11 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.biketrackd.app.R
+import com.biketrackd.app.data.UnitFormatter
+import com.biketrackd.app.data.UnitPreferences
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.ui.theme.GpsFix
 import com.biketrackd.app.ui.theme.GpsNoFix
@@ -47,6 +50,7 @@ fun StatusBar(
 ) {
     val locationState by LocationRepository.state.collectAsState()
     val weather by WeatherRepository.weather.collectAsState()
+    val unitSystem = UnitPreferences.get(context = LocalContext.current)
 
     val batteryText = if (batteryLevel < 0) "--%" else "$batteryLevel%"
 
@@ -146,19 +150,10 @@ fun StatusBar(
 
         Text(
             text = if (locationState.hasFix)
-                String.format("%.0f", locationState.speedKmh) else "--",
+                UnitFormatter.formatSpeed(locationState.speedKmh, unitSystem) else "--",
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface,
-        )
-
-        Spacer(modifier = Modifier.width(3.dp))
-
-        Text(
-            text = "km/h",
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.width(14.dp))
@@ -173,7 +168,9 @@ fun StatusBar(
         Spacer(modifier = Modifier.width(6.dp))
 
         Text(
-            text = weather?.temperatureDisplay() ?: "--°C",
+            text = weather?.let {
+                UnitFormatter.formatCelsius(Math.round(it.temperature), unitSystem)
+            } ?: "--",
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface,

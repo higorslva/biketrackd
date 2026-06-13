@@ -48,13 +48,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import com.biketrackd.app.R
+import com.biketrackd.app.data.OfflineMapInfo
+import com.biketrackd.app.data.OfflineMapManager
+import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.GpxExporter
 import com.biketrackd.app.data.MapOfflineManager
-import com.biketrackd.app.data.OfflineMapInfo
-import com.biketrackd.app.data.OfflineMapManager
+import com.biketrackd.app.data.MonthDist
 import com.biketrackd.app.data.PedalSession
-import com.biketrackd.app.data.SpeedLimitPreferences
+import com.biketrackd.app.data.WeekDist
+import com.biketrackd.app.data.UnitFormatter
+import com.biketrackd.app.data.UnitPreferences
+import com.biketrackd.app.data.UnitPreferences.UnitSystem
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.ui.components.CityResult
 import com.biketrackd.app.ui.components.CitySearchDialog
@@ -86,6 +95,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    var unitSystem by remember { mutableStateOf(UnitPreferences.get(context)) }
     val sessionCount by dao.getSessionCountFlow().collectAsState(initial = 0)
     val totalDist by dao.getTotalDistanceFlow().collectAsState(initial = 0f)
     val totalDur by dao.getTotalDurationFlow().collectAsState(initial = 0L)
@@ -189,7 +199,6 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         }
 
         item {
-            val totalKm = totalDist / 1000f
             val hours = totalDur / 3600
             val minutes = (totalDur % 3600) / 60
             val durStr = if (hours > 0) "${hours}h ${minutes}min" else "${minutes}min"
@@ -201,13 +210,13 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 ),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    StatRow("Total Pedalado", "${String.format("%.1f", totalKm)} km")
+                    StatRow("Total Pedalado", UnitFormatter.formatLongDistance(totalDist, unitSystem))
                     Spacer(modifier = Modifier.height(6.dp))
                     StatRow("Sessões", "$sessionCount")
                     Spacer(modifier = Modifier.height(6.dp))
                     StatRow("Tempo Total", durStr)
                     Spacer(modifier = Modifier.height(6.dp))
-                    StatRow("Média Geral", "${String.format("%.1f", overallAvg)} km/h")
+                    StatRow("Média Geral", UnitFormatter.formatSpeed(overallAvg, unitSystem))
                 }
             }
         }
@@ -228,7 +237,6 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         }
 
         item {
-            val bestKm = bestDist / 1000f
             val bestHours = bestDuration / 3600
             val bestMinutes = (bestDuration % 3600) / 60
             val bestDurStr = if (bestHours > 0) "${bestHours}h ${bestMinutes}min" else "${bestMinutes}min"
@@ -240,11 +248,11 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 ),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    StatRow("🔥 Maior Distância", "${String.format("%.1f", bestKm)} km")
+                    StatRow("\uD83D\uDD25 Maior Distância", UnitFormatter.formatLongDistance(bestDist, unitSystem))
                     Spacer(modifier = Modifier.height(6.dp))
-                    StatRow("⏱  Mais Tempo", bestDurStr)
+                    StatRow("\u23F1  Mais Tempo", bestDurStr)
                     Spacer(modifier = Modifier.height(6.dp))
-                    StatRow("📈 Melhor Média", "${String.format("%.1f", bestAvg)} km/h")
+                    StatRow("\uD83D\uDCC8 Melhor Média", UnitFormatter.formatSpeed(bestAvg, unitSystem))
                 }
             }
         }
@@ -421,7 +429,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = "${String.format("%.0f", currentMax)} km/h",
+                            text = UnitFormatter.formatSpeed(currentMax, unitSystem),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -439,9 +447,9 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("20", style = MaterialTheme.typography.labelSmall,
+                        Text("${UnitFormatter.speedKmhToUnit(20f, unitSystem).toInt()}", style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("100", style = MaterialTheme.typography.labelSmall,
+                        Text("${UnitFormatter.speedKmhToUnit(100f, unitSystem).toInt()}", style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
@@ -500,7 +508,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
-                                text = "${String.format("%.0f", limitValue.value)} km/h",
+                                text = "${String.format("%.0f", UnitFormatter.speedKmhToUnit(limitValue.value, unitSystem))} ${UnitFormatter.speedUnit(unitSystem)}",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -521,11 +529,89 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
-                            Text("10", style = MaterialTheme.typography.labelSmall,
+                            Text("${UnitFormatter.speedKmhToUnit(10f, unitSystem).toInt()}", style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text("60", style = MaterialTheme.typography.labelSmall,
+                            Text("${UnitFormatter.speedKmhToUnit(60f, unitSystem).toInt()}", style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
+                    }
+                }
+            }
+        }
+
+        // === Unit system section ===
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+
+        item {
+            Text(
+                text = "Sistema de Unidades",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+
+        item {
+            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+        }
+
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                unitSystem = UnitSystem.METRIC
+                                UnitPreferences.set(context, UnitSystem.METRIC)
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = unitSystem == UnitSystem.METRIC,
+                            onClick = {
+                                unitSystem = UnitSystem.METRIC
+                                UnitPreferences.set(context, UnitSystem.METRIC)
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = "M\u00E9trico (km/h, m, km, \u00B0C)",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                unitSystem = UnitSystem.IMPERIAL
+                                UnitPreferences.set(context, UnitSystem.IMPERIAL)
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = unitSystem == UnitSystem.IMPERIAL,
+                            onClick = {
+                                unitSystem = UnitSystem.IMPERIAL
+                                UnitPreferences.set(context, UnitSystem.IMPERIAL)
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = "Imperial (mph, ft, mi, \u00B0F)",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
                     }
                 }
             }

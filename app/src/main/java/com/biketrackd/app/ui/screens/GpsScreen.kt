@@ -39,6 +39,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.biketrackd.app.R
 import com.biketrackd.app.data.DownloadProgress
 import com.biketrackd.app.data.MapOfflineManager
+import com.biketrackd.app.data.UnitFormatter
+import com.biketrackd.app.data.UnitPreferences
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.ui.components.DownloadDialog
 import com.biketrackd.app.ui.theme.Green500
@@ -80,6 +82,7 @@ fun GpsScreen() {
     }
 
     val trailPoints = LocationRepository.trailPoints
+    val unitSystem = UnitPreferences.get(context)
 
     LaunchedEffect(mapStateRef) {
         val ms = mapStateRef ?: return@LaunchedEffect
@@ -250,7 +253,7 @@ fun GpsScreen() {
 
         if (state.hasOrigin) {
             Text(
-                text = "\u21A9 ${String.format("%.2f", state.distanceToOrigin / 1000f)} km",
+                text = "\u21A9 ${UnitFormatter.formatLongDistance(state.distanceToOrigin, unitSystem)}",
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,

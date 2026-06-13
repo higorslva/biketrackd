@@ -11,7 +11,7 @@ object WeatherClient {
             val url = URL(
                 "https://api.open-meteo.com/v1/forecast" +
                     "?latitude=$latitude&longitude=$longitude" +
-                    "&current_weather=true"
+                    "&current=temperature_2m,weather_code,wind_speed_10m"
             )
             val conn = url.openConnection() as HttpURLConnection
             conn.connectTimeout = 5000
@@ -22,13 +22,13 @@ object WeatherClient {
             conn.disconnect()
 
             val json = JSONObject(body)
-            val current = json.getJSONObject("current_weather")
+            val current = json.getJSONObject("current")
 
             WeatherData(
-                temperature = current.getDouble("temperature").toFloat(),
-                windspeed = current.getDouble("windspeed").toFloat(),
-                weatherCode = current.getInt("weathercode"),
-                isDay = current.getInt("is_day") == 1
+                temperature = current.getDouble("temperature_2m").toFloat(),
+                windspeed = current.getDouble("wind_speed_10m").toFloat(),
+                weatherCode = current.getInt("weather_code"),
+                isDay = true
             )
         } catch (_: Exception) {
             null

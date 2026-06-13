@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import com.biketrackd.app.R
 import com.biketrackd.app.data.SpeedLimitPreferences
+import com.biketrackd.app.data.UnitFormatter
+import com.biketrackd.app.data.UnitPreferences
 import com.biketrackd.app.location.DeviceThermalManager
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.location.ThermalLevel
@@ -86,6 +88,7 @@ fun SpeedometerScreen(
     )
 
     val ctx = LocalContext.current
+    val unitSystem = UnitPreferences.get(ctx)
     val speedLimitEnabled = SpeedLimitPreferences.isEnabled(ctx)
     val speedLimit = SpeedLimitPreferences.getLimit(ctx)
     val speedLimitExceeded = speedLimitEnabled && state.hasFix && animatedSpeed > speedLimit
@@ -110,7 +113,6 @@ fun SpeedometerScreen(
 
     val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
     val elapsedHms = formatElapsed(state.elapsedSeconds)
-    val totalKm = state.totalOdometerMeters / 1000f
 
     val isMoving = state.speedKmh >= 3f
     val showGearWarning = !state.isSessionActive && isMoving && state.hasFix
@@ -138,7 +140,7 @@ fun SpeedometerScreen(
             ) {
                 DataValue(
                     label = "ALTITUDE",
-                    value = if (state.hasFix) "${state.altitude.toInt()} m" else "--",
+                    value = if (state.hasFix) UnitFormatter.formatAltitude(state.altitude.toFloat(), unitSystem) else "--",
                     valueSize = 20,
                 )
             }
@@ -173,8 +175,7 @@ fun SpeedometerScreen(
                 DataValue(
                     label = "MÁX",
                     value = if (state.hasFix)
-                        String.format("%.0f", state.maxSpeedKmh) else "--",
-                    unit = "km/h",
+                        UnitFormatter.formatSpeed(state.maxSpeedKmh, unitSystem) else "--",
                     valueSize = 20,
                 )
             }
@@ -196,7 +197,9 @@ fun SpeedometerScreen(
                         modifier = Modifier.size(22.dp),
                     )
                     Text(
-                        text = weather?.temperatureDisplay() ?: "--°C",
+                        text = weather?.let {
+                            UnitFormatter.formatCelsius(Math.round(it.temperature), unitSystem)
+                        } ?: "--",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -283,13 +286,13 @@ fun SpeedometerScreen(
                         letterSpacing = (-2).sp,
                     )
                     Text(
-                        text = "km/h",
+                        text = UnitFormatter.speedUnit(unitSystem),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     if (speedLimitExceeded) {
                         Text(
-                            text = "\u26A0 CICLOVIA $speedLimit km/h",
+                            text = "\u26A0 CICLOVIA ${UnitFormatter.speedKmhToUnit(speedLimit.toFloat(), unitSystem).toInt()} ${UnitFormatter.speedUnit(unitSystem)}",
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
                             color = WarningRed,
@@ -351,14 +354,14 @@ fun SpeedometerScreen(
                 DataValue(
                     label = "DISTÂNCIA",
                     value = if (state.hasFix)
-                        String.format("%.2f km", state.totalDistanceMeters / 1000f) else "-- km",
+                        UnitFormatter.formatLongDistance(state.totalDistanceMeters, unitSystem) else "--",
                     valueSize = 20,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 DataValue(
                     label = "TOTAL",
-                    value = if (totalKm >= 1f)
-                        String.format("%.1f km", totalKm) else "${state.totalOdometerMeters.toInt()} m",
+                    value = if (state.hasFix)
+                        UnitFormatter.formatTotalDistance(state.totalOdometerMeters, unitSystem) else "--",
                     valueSize = 20,
                 )
             }
