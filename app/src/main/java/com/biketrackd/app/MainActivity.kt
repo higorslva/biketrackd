@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.biketrackd.app.data.AppDatabase
+import com.biketrackd.app.data.OrientationPreferences
 import com.biketrackd.app.data.PedalSession
 import com.biketrackd.app.location.DeviceThermalManager
 import com.biketrackd.app.location.LocationRepository
@@ -105,6 +106,14 @@ class MainActivity : ComponentActivity() {
         DeviceThermalManager.init(this)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        val orientation = OrientationPreferences.get(this)
+        requestedOrientation = when (orientation) {
+            OrientationPreferences.Orientation.PORTRAIT ->
+                android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            OrientationPreferences.Orientation.LANDSCAPE ->
+                android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        }
 
         setContent {
             GpsOssTheme {

@@ -44,6 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
+import android.content.res.Configuration
 import com.biketrackd.app.R
 import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.data.UnitFormatter
@@ -118,13 +120,217 @@ fun SpeedometerScreen(
     val showGearWarning = !state.isSessionActive && isMoving && state.hasFix
     val segmentFont = FontFamily(Font(R.font.segment7standard))
 
-    Row(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 48.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        // === LEFT CLUSTER ===
+    val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    if (isPortrait) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                WarningLight(
+                    color = when {
+                        batteryLevel <= 15 -> WarningRed
+                        batteryLevel <= 40 -> WarningAmber
+                        else -> SpeedLow
+                    },
+                    label = "BAT",
+                    blinking = batteryLevel <= 15,
+                    isCritical = batteryLevel <= 15,
+                )
+                WarningLight(
+                    color = if (showGearWarning) WarningAmber else SpeedLow,
+                    label = "ENG",
+                )
+                WarningLight(
+                    color = when {
+                        !state.hasFix -> GpsNoFix
+                        state.speedKmh < 3f -> GpsWeak
+                        else -> GpsFix
+                    },
+                    label = "GPS",
+                    blinking = !state.hasFix,
+                    isCritical = !state.hasFix,
+                )
+                WarningLight(
+                    color = when (thermalLevel) {
+                        ThermalLevel.NORMAL, ThermalLevel.UNKNOWN -> SpeedLow
+                        ThermalLevel.WARM -> WarningAmber
+                        ThermalLevel.MODERATE, ThermalLevel.HOT, ThermalLevel.CRITICAL -> WarningRed
+                    },
+                    label = "TMP",
+                    blinking = thermalLevel in listOf(
+                        ThermalLevel.MODERATE, ThermalLevel.HOT, ThermalLevel.CRITICAL
+                    ),
+                    isCritical = thermalLevel in listOf(
+                        ThermalLevel.MODERATE, ThermalLevel.HOT, ThermalLevel.CRITICAL
+                    ),
+                )
+            }
+
+            Box(
+                modifier = Modifier.size(260.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                SpeedometerArc(
+                    speed = animatedSpeed,
+                    hasFix = state.hasFix,
+                    maxSpeedArc = maxSpeedArc,
+                    speedColor = speedColor,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = if (state.hasFix) String.format("%.0f", animatedSpeed) else "--",
+                        fontSize = 72.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = segmentFont,
+                        color = speedColor,
+                        letterSpacing = (-2).sp,
+                    )
+                    Text(
+                        text = UnitFormatter.speedUnit(unitSystem),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    if (speedLimitExceeded) {
+                        Text(
+                            text = "\u26A0 CICLOVIA ${UnitFormatter.speedKmhToUnit(speedLimit.toFloat(), unitSystem).toInt()} ${UnitFormatter.speedUnit(unitSystem)}",
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = WarningRed,
+                        )
+                    }
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        RoundedCornerShape(12.dp),
+                    )
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = time,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    DataValue(
+                        label = "ALTITUDE",
+                        value = if (state.hasFix) UnitFormatter.formatAltitude(state.altitude.toFloat(), unitSystem) else "--",
+                        valueSize = 16,
+                    )
+                    val slopeColor = when {
+                        state.slope > 5f -> WarningRed
+                        state.slope > 2f -> WarningAmber
+                        state.slope < -5f -> WarningRed
+                        state.slope < -2f -> WarningAmber
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                    val slopeSign = if (state.slope > 0f) "+" else ""
+                    DataValue(
+                        label = "INCLINAÇÃO",
+                        value = if (state.hasFix) "${slopeSign}${String.format("%.0f", state.slope)}%" else "--",
+                        valueColor = slopeColor,
+                        valueSize = 16,
+                    )
+                    DataValue(
+                        label = "MÁX",
+                        value = if (state.hasFix) UnitFormatter.formatSpeed(state.maxSpeedKmh, unitSystem) else "--",
+                        valueSize = 16,
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Icon(
+                            painter = weatherIconPainter(weather?.weatherCode ?: -1),
+                            contentDescription = "Clima",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Text(
+                            text = weather?.let {
+                                UnitFormatter.formatCelsius(Math.round(it.temperature), unitSystem)
+                            } ?: "--",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    DataValue(label = "TEMPO", value = elapsedHms, valueSize = 16)
+                    DataValue(
+                        label = "DISTÂNCIA",
+                        value = if (state.hasFix)
+                            UnitFormatter.formatLongDistance(state.totalDistanceMeters, unitSystem) else "--",
+                        valueSize = 16,
+                    )
+                    DataValue(
+                        label = "TOTAL",
+                        value = if (state.hasFix)
+                            UnitFormatter.formatTotalDistance(state.totalOdometerMeters, unitSystem) else "--",
+                        valueSize = 16,
+                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        BatteryBar(
+                            level = batteryLevel,
+                            isCharging = isBatteryCharging,
+                            modifier = Modifier.fillMaxWidth(0.6f).height(16.dp),
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = batteryText,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
+                                color = batteryColor,
+                            )
+                            if (isBatteryCharging) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_bolt),
+                                    contentDescription = "Carregando",
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier.size(20.dp).padding(start = 2.dp),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        Row(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 48.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // === LEFT CLUSTER ===
         Column(
             modifier = Modifier
                 .weight(1.2f)
@@ -402,6 +608,7 @@ fun SpeedometerScreen(
                 }
             }
         }
+    }
     }
 }
 

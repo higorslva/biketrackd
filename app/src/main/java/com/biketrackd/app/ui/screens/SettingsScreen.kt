@@ -1,5 +1,7 @@
 package com.biketrackd.app.ui.screens
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -54,6 +56,8 @@ import androidx.compose.material3.RadioButtonDefaults
 import com.biketrackd.app.R
 import com.biketrackd.app.data.OfflineMapInfo
 import com.biketrackd.app.data.OfflineMapManager
+import com.biketrackd.app.data.OrientationPreferences
+import com.biketrackd.app.data.OrientationPreferences.Orientation
 import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.GpxExporter
@@ -96,6 +100,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     }
 
     var unitSystem by remember { mutableStateOf(UnitPreferences.get(context)) }
+    var orientationPref by remember { mutableStateOf(OrientationPreferences.get(context)) }
     val sessionCount by dao.getSessionCountFlow().collectAsState(initial = 0)
     val totalDist by dao.getTotalDistanceFlow().collectAsState(initial = 0f)
     val totalDur by dao.getTotalDurationFlow().collectAsState(initial = 0L)
@@ -609,6 +614,92 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         )
                         Text(
                             text = "Imperial (mph, ft, mi, \u00B0F)",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+            }
+        }
+
+        // === Orientation section ===
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+
+        item {
+            Text(
+                text = "Orienta\u00E7\u00E3o da Tela",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+
+        item {
+            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+        }
+
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                orientationPref = Orientation.LANDSCAPE
+                                OrientationPreferences.set(context, Orientation.LANDSCAPE)
+                                (context as? Activity)?.requestedOrientation =
+                                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = orientationPref == Orientation.LANDSCAPE,
+                            onClick = {
+                                orientationPref = Orientation.LANDSCAPE
+                                OrientationPreferences.set(context, Orientation.LANDSCAPE)
+                                (context as? Activity)?.requestedOrientation =
+                                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = "Paisagem",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                orientationPref = Orientation.PORTRAIT
+                                OrientationPreferences.set(context, Orientation.PORTRAIT)
+                                (context as? Activity)?.requestedOrientation =
+                                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = orientationPref == Orientation.PORTRAIT,
+                            onClick = {
+                                orientationPref = Orientation.PORTRAIT
+                                OrientationPreferences.set(context, Orientation.PORTRAIT)
+                                (context as? Activity)?.requestedOrientation =
+                                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = "Retrato",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
