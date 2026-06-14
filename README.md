@@ -1,23 +1,25 @@
 # BikeTrackd
 
-A cycling speedometer and GPS tracker for Android. Built with Jetpack Compose + Material 3, osmdroid maps, and Room database.
+A cycling speedometer and GPS tracker for Android. Built with Jetpack Compose + Material 3, MapLibre GL maps, and Room database.
 
 ## Features
 
 - **Speedometer** — real-time speed with animated counter and color gradient (green → yellow → red)
-- **GPS Map** — osmdroid map with trail tracking, follow mode, rotation (GPS + gestures), and offline tile download
+- **GPS Map** — MapLibre GL map with trail tracking, follow mode, rotation (GPS + gestures), and offline tile download
 - **Session Recording** — start/stop sessions with distance, max/avg speed, duration; data persisted with Room
 - **GPX Export** — export any recorded session via share sheet
 - **Weather** — current temperature display via Open-Meteo API
-- **Offline Maps** — download city tiles (zoom 10–14, 40km radius) stored as .mbtiles
+- **Offline Maps** — download city tiles (zoom 10–14, 40km radius) via MapLibre OfflineManager
 - **Battery Status** — built-in battery level indicator
+- **Unit System** — metric/imperial toggle with live conversion (km/h ↔ mph, m ↔ ft, °C ↔ °F)
+- **Orientation** — landscape/portrait toggle with optimized layouts
 
 ## Tech Stack
 
 | Layer | Library |
 |-------|---------|
 | UI | Jetpack Compose + Material 3 |
-| Map | osmdroid (OpenTopoMap tiles) |
+| Map | MapLibre GL (OpenFreeMap vector tiles) |
 | Persistence | Room (SQLite) |
 | Weather | Open-Meteo API |
 | Location | Android Fused Location Provider |
