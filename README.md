@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> Support an open Android ecosystem: [keepandroidopen.org](https://keepandroidopen.org/) ·
+> [Change.org — Stop Google from limiting APK file usage](https://www.change.org/p/stop-google-from-limiting-apk-file-usage)
+
 # BikeTrackd
 
 A cycling speedometer and GPS tracker for Android. Built with Jetpack Compose + Material 3, MapLibre GL maps, and Room database.
