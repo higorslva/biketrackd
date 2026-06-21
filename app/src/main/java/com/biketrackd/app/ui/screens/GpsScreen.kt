@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -30,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -38,7 +41,10 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.biketrackd.app.R
 import com.biketrackd.app.data.DownloadProgress
+import com.biketrackd.app.data.GraphHopperClient
+import com.biketrackd.app.data.GraphHopperPreferences
 import com.biketrackd.app.data.MapOfflineManager
+import com.biketrackd.app.data.RouteInfo
 import com.biketrackd.app.data.UnitFormatter
 import com.biketrackd.app.data.UnitPreferences
 import com.biketrackd.app.location.LocationRepository
@@ -75,6 +81,8 @@ fun GpsScreen() {
     var lastResetCount by remember { mutableStateOf(0) }
     var mapStateRef by remember { mutableStateOf<MapLibreMapState?>(null) }
     var mapViewRef by remember { mutableStateOf<MapView?>(null) }
+    var destination by remember { mutableStateOf<LatLng?>(null) }
+    var routeInfo by remember { mutableStateOf<RouteInfo?>(null) }
 
     if (state.resetCount != lastResetCount) {
         lastResetCount = state.resetCount
@@ -178,7 +186,48 @@ fun GpsScreen() {
                                 },
                             )
 
+                            val destPin = drawableToBitmap(ctx, R.drawable.ic_destination_marker)
+                            style.addImage("dest-pin", destPin)
+                            style.addSource(GeoJsonSource("destination"))
+                            style.addLayer(
+                                SymbolLayer("destination-layer", "destination").apply {
+                                    setProperties(
+                                        PropertyFactory.iconImage("dest-pin"),
+                                        PropertyFactory.iconAnchor(Property.ICON_ANCHOR_CENTER),
+                                        PropertyFactory.visibility(Property.NONE),
+                                    )
+                                },
+                            )
+
+                            style.addSource(GeoJsonSource("route"))
+                            style.addLayer(
+                                LineLayer("route-layer", "route").apply {
+                                    setProperties(
+                                        PropertyFactory.lineColor(android.graphics.Color.parseColor("#FF5722")),
+                                        PropertyFactory.lineWidth(6f),
+                                        PropertyFactory.lineCap(Property.LINE_CAP_ROUND),
+                                        PropertyFactory.lineJoin(Property.LINE_JOIN_ROUND),
+                                        PropertyFactory.visibility(Property.NONE),
+                                    )
+                                },
+                            )
+
                             mapStateRef = MapLibreMapState(map, style)
+                        }
+
+                        map.addOnMapLongClickListener { latLng ->
+                            destination = latLng
+                            routeInfo = null
+                            mapStateRef?.style?.getSourceAs<GeoJsonSource>("destination")?.setGeoJson(
+                                Feature.fromGeometry(Point.fromLngLat(latLng.longitude, latLng.latitude)),
+                            )
+                            mapStateRef?.style?.getLayerAs<SymbolLayer>("destination-layer")?.setProperties(
+                                PropertyFactory.visibility(Property.VISIBLE),
+                            )
+                            mapStateRef?.style?.getLayerAs<LineLayer>("route-layer")?.setProperties(
+                                PropertyFactory.visibility(Property.NONE),
+                            )
+                            true
                         }
 
                         map.addOnMapClickListener { _ ->
@@ -268,6 +317,128 @@ fun GpsScreen() {
             )
         }
 
+        if (destination != null) {
+            val apiKey = GraphHopperPreferences.getApiKey(context)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(top = 12.dp, start = 12.dp)
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    .padding(12.dp),
+            ) {
+                Text(
+                    text = "${String.format("%.5f", destination!!.latitude)}, ${String.format("%.5f", destination!!.longitude)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (routeInfo != null) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = routeInfo!!.distanceDisplay,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = routeInfo!!.timeDisplay,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                if (routeInfo != null || destination != null) {
+                    Button(
+                        onClick = {
+                            destination = null
+                            routeInfo = null
+                            mapStateRef?.style?.getLayerAs<SymbolLayer>("destination-layer")
+                                ?.setProperties(PropertyFactory.visibility(Property.NONE))
+                            mapStateRef?.style?.getLayerAs<LineLayer>("route-layer")
+                                ?.setProperties(PropertyFactory.visibility(Property.NONE))
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError,
+                        ),
+                    ) {
+                        Text(stringResource(R.string.btn_clear), style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            }
+
+            if (routeInfo == null) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(12.dp),
+                ) {
+                    Button(
+                        onClick = {
+                            if (apiKey.isBlank()) {
+                                return@Button
+                            }
+                            val dest = destination ?: return@Button
+                            scope.launch {
+                                GraphHopperClient.getRoute(
+                                    apiKey = apiKey,
+                                    originLat = state.latitude,
+                                    originLon = state.longitude,
+                                    destLat = dest.latitude,
+                                    destLon = dest.longitude,
+                                ).onSuccess { route ->
+                                    routeInfo = route
+                                    val coords = route.points.map {
+                                        Point.fromLngLat(it.longitude, it.latitude)
+                                    }
+                                    val lineString = if (coords.isNotEmpty())
+                                        LineString.fromLngLats(coords) else null
+                                    if (lineString != null) {
+                                        mapStateRef?.style?.getSourceAs<GeoJsonSource>("route")
+                                            ?.setGeoJson(Feature.fromGeometry(lineString))
+                                        mapStateRef?.style?.getLayerAs<LineLayer>("route-layer")
+                                            ?.setProperties(
+                                                PropertyFactory.visibility(Property.VISIBLE),
+                                            )
+                                    }
+                                }.onFailure {
+                                    // silently ignore
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
+                    ) {
+                        Text(
+                            stringResource(R.string.btn_tracar_rota),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
+                }
+            }
+        }
+
+        if (state.hasOrigin) {
+            Text(
+                text = "\u21A9 ${UnitFormatter.formatLongDistance(state.distanceToOrigin, unitSystem)}",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 12.dp, end = 12.dp)
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
+                        shape = RoundedCornerShape(8.dp),
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+            )
+        }
+
         Column(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -287,7 +458,7 @@ fun GpsScreen() {
                     ),
                 ) {
                     Text(
-                        text = if (followMode) "SEGUINDO" else "SEGUIR",
+                        text = stringResource(if (followMode) R.string.btn_following else R.string.btn_follow),
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
@@ -302,8 +473,7 @@ fun GpsScreen() {
                     ),
                 ) {
                     Text(
-                        text = if (downloadProgress.status == DownloadProgress.Status.Completed)
-                            "\u2713 Salvo" else "Salvar offline",
+                        text = stringResource(if (downloadProgress.status == DownloadProgress.Status.Completed) R.string.btn_saved_offline else R.string.btn_save_offline),
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
@@ -314,13 +484,9 @@ fun GpsScreen() {
     if (showDownloadConfirm && state.hasFix) {
         AlertDialog(
             onDismissRequest = { showDownloadConfirm = false },
-            title = { Text("Baixar mapa offline") },
+            title = { Text(stringResource(R.string.dialog_download_title)) },
             text = {
-                Text(
-                    "Baixar tiles vectoriais de zoom 10 a 15 num raio de 40km " +
-                        "ao redor da sua posição atual?\n\n" +
-                        "Recomendado: use Wi-Fi. Mapas vectoriais são 5-10x menores que raster.",
-                )
+                Text(stringResource(R.string.dialog_download_message))
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -328,18 +494,18 @@ fun GpsScreen() {
                     scope.launch {
                         MapOfflineManager.download(
                             context = context,
-                            name = "Mapa ${String.format("%.4f", state.latitude)}, ${String.format("%.4f", state.longitude)}",
+                            name = context.getString(R.string.dialog_download_name, state.latitude, state.longitude),
                             centerLat = state.latitude,
                             centerLon = state.longitude,
                             radiusKm = 40,
                         )
                     }
-                }) { Text("Baixar") }
+                }) { Text(stringResource(R.string.btn_download)) }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showDownloadConfirm = false
-                }) { Text("Cancelar") }
+                }) { Text(stringResource(R.string.btn_cancel)) }
             },
         )
     }

@@ -3,6 +3,7 @@ package com.biketrackd.app.data
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
+import com.biketrackd.app.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -66,6 +67,6 @@ object GpxExporter {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
-        context.startActivity(Intent.createChooser(intent, "Exportar rota via"))
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.title_share_route)))
     }
 }

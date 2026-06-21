@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -265,7 +266,7 @@ fun SpeedometerScreen(
                     ) {
                         Icon(
                             painter = weatherIconPainter(weather?.weatherCode ?: -1),
-                            contentDescription = "Clima",
+                            contentDescription = stringResource(R.string.desc_weather),
                             tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(18.dp),
                         )
@@ -313,7 +314,7 @@ fun SpeedometerScreen(
                             if (isBatteryCharging) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_bolt),
-                                    contentDescription = "Carregando",
+                                    contentDescription = stringResource(R.string.desc_charging),
                                     tint = Color.Unspecified,
                                     modifier = Modifier.size(20.dp).padding(start = 2.dp),
                                 )
@@ -398,7 +399,7 @@ fun SpeedometerScreen(
                 ) {
                     Icon(
                         painter = weatherIconPainter(weather?.weatherCode ?: -1),
-                        contentDescription = "Clima",
+                        contentDescription = stringResource(R.string.desc_weather),
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(22.dp),
                     )
@@ -498,7 +499,7 @@ fun SpeedometerScreen(
                     )
                     if (speedLimitExceeded) {
                         Text(
-                            text = "\u26A0 CICLOVIA ${UnitFormatter.speedKmhToUnit(speedLimit.toFloat(), unitSystem).toInt()} ${UnitFormatter.speedUnit(unitSystem)}",
+                            text = stringResource(R.string.warning_speed_limit, UnitFormatter.speedKmhToUnit(speedLimit.toFloat(), unitSystem).toInt(), UnitFormatter.speedUnit(unitSystem)),
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
                             color = WarningRed,
@@ -598,7 +599,7 @@ fun SpeedometerScreen(
                     if (isBatteryCharging) {
                         Icon(
                             painter = painterResource(R.drawable.ic_bolt),
-                            contentDescription = "Carregando",
+                            contentDescription = stringResource(R.string.desc_charging),
                             tint = Color.Unspecified,
                             modifier = Modifier
                                 .size(24.dp)

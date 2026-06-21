@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,7 +89,7 @@ fun StatusBar(
     ) {
         Icon(
             painter = painterResource(currentIcon),
-            contentDescription = "Bateria",
+            contentDescription = stringResource(R.string.desc_battery),
             tint = Color.Unspecified,
             modifier = Modifier.size(16.dp),
         )
@@ -105,7 +106,7 @@ fun StatusBar(
         Spacer(modifier = Modifier.width(14.dp))
 
         Text(
-            text = "GPS:",
+            text = stringResource(R.string.label_gps),
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface,
@@ -140,7 +141,7 @@ fun StatusBar(
         Spacer(modifier = Modifier.width(6.dp))
 
         Text(
-            text = if (locationState.hasFix) "OK" else "--",
+            text = if (locationState.hasFix) stringResource(R.string.label_gps_ok) else "--",
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface,
@@ -160,7 +161,7 @@ fun StatusBar(
 
         Icon(
             painter = weatherIconPainter(weather?.weatherCode ?: -1),
-            contentDescription = "Clima",
+            contentDescription = stringResource(R.string.desc_weather),
             tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.size(16.dp),
         )
@@ -189,8 +190,8 @@ fun StatusBar(
                 else MaterialTheme.colorScheme.surfaceVariant,
         ) {
             Text(
-                text = if (locationState.isSessionActive) "⏹ ENCERRAR"
-                    else "▶ INICIAR",
+                text = if (locationState.isSessionActive) stringResource(R.string.btn_end_session)
+                    else stringResource(R.string.btn_start_session),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
                 color = if (locationState.isSessionActive)
@@ -204,7 +205,7 @@ fun StatusBar(
 
         Icon(
             painter = painterResource(R.drawable.ic_clock),
-            contentDescription = "Hora",
+            contentDescription = stringResource(R.string.desc_clock),
             tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.size(16.dp),
         )

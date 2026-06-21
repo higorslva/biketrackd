@@ -27,6 +27,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +43,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -61,6 +63,8 @@ import com.biketrackd.app.data.OrientationPreferences.Orientation
 import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.GpxExporter
+import com.biketrackd.app.data.GraphHopperPreferences
+import com.biketrackd.app.data.LanguagePreferences
 import com.biketrackd.app.data.MapOfflineManager
 import com.biketrackd.app.data.MonthDist
 import com.biketrackd.app.data.PedalSession
@@ -126,7 +130,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 onClick = {
                     val state = LocationRepository.state.value
                     if (!state.hasFix || state.elapsedSeconds < 5) {
-                        Toast.makeText(context, "Nenhum dado de sessão", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.toast_no_session), Toast.LENGTH_SHORT).show()
                         return@Button
                     }
                     scope.launch {
@@ -142,13 +146,13 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                             )
                         )
                         LocationRepository.addToTotalOdometer(state.totalDistanceMeters)
-                        Toast.makeText(context, "Sessão salva!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.toast_session_saved), Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
             ) {
-                Text("Salvar Sessão")
+                Text(stringResource(R.string.btn_save_session))
             }
         }
 
@@ -158,7 +162,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             Button(
                 onClick = {
                     LocationRepository.resetSession()
-                    Toast.makeText(context, "Sessão reiniciada", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.toast_session_reset), Toast.LENGTH_SHORT).show()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -166,7 +170,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 ),
             ) {
-                Text("Reiniciar Sessão")
+                Text(stringResource(R.string.btn_reset_session))
             }
         }
 
@@ -174,7 +178,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
         item {
             Text(
-                text = "Histórico",
+                text = stringResource(R.string.section_history),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -193,7 +197,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
         item {
             Text(
-                text = "Estatísticas Gerais",
+                text = stringResource(R.string.section_stats),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -215,13 +219,13 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 ),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    StatRow("Total Pedalado", UnitFormatter.formatLongDistance(totalDist, unitSystem))
+                    StatRow(stringResource(R.string.stat_total_ridden), UnitFormatter.formatLongDistance(totalDist, unitSystem))
                     Spacer(modifier = Modifier.height(6.dp))
-                    StatRow("Sessões", "$sessionCount")
+                    StatRow(stringResource(R.string.stat_sessions), "$sessionCount")
                     Spacer(modifier = Modifier.height(6.dp))
-                    StatRow("Tempo Total", durStr)
+                    StatRow(stringResource(R.string.stat_total_time), durStr)
                     Spacer(modifier = Modifier.height(6.dp))
-                    StatRow("Média Geral", UnitFormatter.formatSpeed(overallAvg, unitSystem))
+                    StatRow(stringResource(R.string.stat_avg_speed), UnitFormatter.formatSpeed(overallAvg, unitSystem))
                 }
             }
         }
@@ -231,7 +235,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
         item {
             Text(
-                text = "Recordes Pessoais",
+                text = stringResource(R.string.section_records),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -253,11 +257,11 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 ),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    StatRow("\uD83D\uDD25 Maior Distância", UnitFormatter.formatLongDistance(bestDist, unitSystem))
+                    StatRow(stringResource(R.string.stat_best_distance), UnitFormatter.formatLongDistance(bestDist, unitSystem))
                     Spacer(modifier = Modifier.height(6.dp))
-                    StatRow("\u23F1  Mais Tempo", bestDurStr)
+                    StatRow(stringResource(R.string.stat_best_time), bestDurStr)
                     Spacer(modifier = Modifier.height(6.dp))
-                    StatRow("\uD83D\uDCC8 Melhor Média", UnitFormatter.formatSpeed(bestAvg, unitSystem))
+                    StatRow(stringResource(R.string.stat_best_avg), UnitFormatter.formatSpeed(bestAvg, unitSystem))
                 }
             }
         }
@@ -272,12 +276,12 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = if (showWeekly) "Distância por Semana" else "Distância por Mês",
+                    text = stringResource(if (showWeekly) R.string.section_distance_week else R.string.section_distance_month),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    text = if (showWeekly) "Mensal" else "Semanal",
+                    text = stringResource(if (showWeekly) R.string.btn_toggle_monthly else R.string.btn_toggle_weekly),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable { showWeekly = !showWeekly },
@@ -357,7 +361,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
         item {
             Text(
-                text = "Sequência",
+                text = stringResource(R.string.section_streak),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -383,14 +387,15 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "🔥 $streak ${if (streak == 1) "dia" else "dias"} consecutivos",
+                        text = stringResource(R.string.label_streak, streak,
+                            stringResource(if (streak == 1) R.string.label_streak_day else R.string.label_streak_days)),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Última: $lastDate",
+                        text = stringResource(R.string.label_last_date, lastDate),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -403,7 +408,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
         item {
             Text(
-                text = "Configurações",
+                text = stringResource(R.string.section_config),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -429,7 +434,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text(
-                            text = "Velocidade Máxima",
+                            text = stringResource(R.string.label_max_speed),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -477,7 +482,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "\uD83D\uDEB2 Limite de Ciclovia",
+                        text = stringResource(R.string.section_speed_limit),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -489,7 +494,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Ativar aviso",
+                            text = stringResource(R.string.label_enable_warning),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -508,7 +513,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             Text(
-                                text = "Limite",
+                                text = stringResource(R.string.label_limit),
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
@@ -549,7 +554,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
         item {
             Text(
-                text = "Sistema de Unidades",
+                text = stringResource(R.string.section_unit_system),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -588,7 +593,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                             ),
                         )
                         Text(
-                            text = "M\u00E9trico (km/h, m, km, \u00B0C)",
+                            text = stringResource(R.string.label_metric),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -613,7 +618,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                             ),
                         )
                         Text(
-                            text = "Imperial (mph, ft, mi, \u00B0F)",
+                            text = stringResource(R.string.label_imperial),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -627,7 +632,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
         item {
             Text(
-                text = "Orienta\u00E7\u00E3o da Tela",
+                text = stringResource(R.string.section_orientation),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -670,7 +675,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                             ),
                         )
                         Text(
-                            text = "Paisagem",
+                            text = stringResource(R.string.label_landscape),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -699,10 +704,169 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                             ),
                         )
                         Text(
-                            text = "Retrato",
+                            text = stringResource(R.string.label_portrait),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
+                    }
+                }
+            }
+        }
+
+        // === Language section ===
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+
+        item {
+            Text(
+                text = stringResource(R.string.section_language),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+
+        item {
+            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+        }
+
+        item {
+            var lang by remember { mutableStateOf(LanguagePreferences.get(context)) }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                LanguagePreferences.set(context, "")
+                                (context as? Activity)?.recreate()
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = lang == "",
+                            onClick = {
+                                LanguagePreferences.set(context, "")
+                                (context as? Activity)?.recreate()
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = stringResource(R.string.label_language_system),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                LanguagePreferences.set(context, "pt")
+                                (context as? Activity)?.recreate()
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = lang == "pt",
+                            onClick = {
+                                LanguagePreferences.set(context, "pt")
+                                (context as? Activity)?.recreate()
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = stringResource(R.string.label_language_pt),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                LanguagePreferences.set(context, "en")
+                                (context as? Activity)?.recreate()
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = lang == "en",
+                            onClick = {
+                                LanguagePreferences.set(context, "en")
+                                (context as? Activity)?.recreate()
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = stringResource(R.string.label_language_en),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+            }
+        }
+
+        // === GraphHopper section ===
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+
+        item {
+            Text(
+                text = "Rotas GraphHopper",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+
+        item {
+            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+        }
+
+        item {
+            var apiKey by remember { mutableStateOf(GraphHopperPreferences.getApiKey(context)) }
+            var saved by remember { mutableStateOf(false) }
+
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Chave da API para navega\u00E7\u00E3o A\u2192B (graphhopper.com)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = apiKey,
+                        onValueChange = { apiKey = it; saved = false },
+                        label = { Text("GraphHopper API Key") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = {
+                            GraphHopperPreferences.setApiKey(context, apiKey)
+                            saved = true
+                        },
+                        modifier = Modifier.align(Alignment.End),
+                    ) {
+                        Text(if (saved) "Salvo \u2713" else "Salvar")
                     }
                 }
             }
@@ -713,7 +877,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
         item {
             Text(
-                text = "Mapas Offline",
+                text = stringResource(R.string.section_offline_maps),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -726,7 +890,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         if (offlineMaps.isEmpty()) {
             item {
                 Text(
-                    text = "Nenhum mapa salvo",
+                    text = stringResource(R.string.label_no_maps),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 8.dp),
@@ -757,7 +921,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 ),
             ) {
-                Text("Baixar por cidade")
+                Text(stringResource(R.string.btn_download_city))
             }
         }
 
@@ -783,14 +947,14 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = "BikeTrackd v0.3",
+                        text = stringResource(R.string.about_title),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Ciclocomputador offline de código aberto",
+                        text = stringResource(R.string.about_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -867,7 +1031,7 @@ private fun OfflineMapCard(
             IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Apagar",
+                    contentDescription = stringResource(R.string.desc_delete),
                     tint = MaterialTheme.colorScheme.error,
                 )
             }
@@ -906,8 +1070,7 @@ private fun SessionCard(session: PedalSession) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Média ${String.format("%.1f", avg)} km/h  " +
-                        "Max ${String.format("%.0f", max)} km/h  ${minutes} min",
+                    text = stringResource(R.string.label_session_card, avg, max, minutes),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -925,12 +1088,12 @@ private fun SessionCard(session: PedalSession) {
                         val gpx = GpxExporter.generate(points, session)
                         GpxExporter.share(context, gpx, session)
                     } catch (_: Exception) {
-                        Toast.makeText(context, "Erro ao exportar", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.toast_export_error), Toast.LENGTH_SHORT).show()
                     }
                 }) {
                     Icon(
                         Icons.Default.Share,
-                        contentDescription = "Exportar GPX",
+                        contentDescription = stringResource(R.string.desc_export_gpx),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp),
                     )

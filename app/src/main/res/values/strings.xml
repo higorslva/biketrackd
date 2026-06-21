@@ -1,4 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name">BikeTrackd</string>
+
+    <!-- Sidebar -->
+    <string name="desc_sidebar_gps">GPS</string>
+    <string name="desc_sidebar_panel">DASHBOARD</string>
+    <string name="desc_sidebar_options">SETTINGS</string>
+
+    <!-- StatusBar -->
+    <string name="desc_battery">Battery</string>
+    <string name="label_gps">GPS:</string>
+    <string name="label_gps_ok">OK</string>
+    <string name="desc_weather">Weather</string>
+    <string name="btn_end_session">\u23f9 STOP</string>
+    <string name="btn_start_session">\u25b6 START</string>
+    <string name="desc_clock">Clock</string>
+
+    <!-- Speedometer labels -->
+    <string name="label_warning_bat">BAT</string>
+    <string name="label_warning_eng">ENG</string>
+    <string name="label_warning_gps">GPS</string>
+    <string name="label_warning_tmp">TMP</string>
+    <string name="warning_speed_limit">\u26a0 BIKE LANE %d %s</string>
+    <string name="label_altitude">ALTITUDE</string>
+    <string name="label_grade">GRADE</string>
+    <string name="label_max">MAX</string>
+    <string name="label_time">TIME</string>
+    <string name="label_distance">DISTANCE</string>
+    <string name="label_total">TOTAL</string>
+    <string name="desc_charging">Charging</string>
+
+    <!-- MainActivity -->
+    <string name="toast_gps_permission">GPS permission required</string>
+    <string name="desc_close_sidebar">Close</string>
+    <string name="desc_open_sidebar">Menu</string>
+    <string name="dialog_save_title">Save session?</string>
+    <string name="dialog_save_message">Distance: %.2f km\nAvg: %.1f km/h\nMax: %.0f km/h\nDuration: %d min</string>
+    <string name="btn_discard">Discard</string>
+
+    <!-- SettingsScreen -->
+    <string name="toast_no_session">No session data</string>
+    <string name="toast_session_saved">Session saved!</string>
+    <string name="btn_save_session">Save Session</string>
+    <string name="toast_session_reset">Session reset</string>
+    <string name="btn_reset_session">Reset Session</string>
+    <string name="section_history">History</string>
+    <string name="section_stats">General Statistics</string>
+    <string name="stat_total_ridden">Total Ridden</string>
+    <string name="stat_sessions">Sessions</string>
+    <string name="stat_total_time">Total Time</string>
+    <string name="stat_avg_speed">Average Speed</string>
+    <string name="section_records">Personal Records</string>
+    <string name="stat_best_distance">\ud83d\udd25 Best Distance</string>
+    <string name="stat_best_time">\u23f1  Best Time</string>
+    <string name="stat_best_avg">\ud83d\udcc8 Best Average</string>
+    <string name="section_distance_week">Distance per Week</string>
+    <string name="section_distance_month">Distance per Month</string>
+    <string name="btn_toggle_monthly">Monthly</string>
+    <string name="btn_toggle_weekly">Weekly</string>
+    <string name="section_streak">Streak</string>
+    <string name="label_streak">\ud83d\udd25 %d %s in a row</string>
+    <string name="label_streak_day">day</string>
+    <string name="label_streak_days">days</string>
+    <string name="label_last_date">Last: %s</string>
+    <string name="section_config">Settings</string>
+    <string name="label_max_speed">Max Speed</string>
+    <string name="section_speed_limit">\ud83d\udeb2 Bike Lane Limit</string>
+    <string name="label_enable_warning">Enable warning</string>
+    <string name="label_limit">Limit</string>
+    <string name="section_unit_system">Unit System</string>
+    <string name="label_metric">Metric (km/h, m, km, \u00b0C)</string>
+    <string name="label_imperial">Imperial (mph, ft, mi, \u00b0F)</string>
+    <string name="section_orientation">Screen Orientation</string>
+    <string name="label_landscape">Landscape</string>
+    <string name="label_portrait">Portrait</string>
+    <string name="section_language">Language</string>
+    <string name="label_language_system">System default</string>
+    <string name="label_language_pt" translatable="false">Portugu\u00eas</string>
+    <string name="label_language_en" translatable="false">English</string>
+    <string name="section_gh">GraphHopper Routes</string>
+    <string name="label_gh_desc">API key for A\u2192B navigation (graphhopper.com)</string>
+    <string name="label_gh_saved">Saved \u2713</string>
+    <string name="section_offline_maps">Offline Maps</string>
+    <string name="label_no_maps">No saved maps</string>
+    <string name="btn_download_city">Download by city</string>
+    <string name="about_title">BikeTrackd v0.3</string>
+    <string name="about_desc">Open-source offline bike computer</string>
+    <string name="about_link">github.com/higorslva/biketrackd</string>
+    <string name="desc_delete">Delete</string>
+    <string name="label_session_card">Avg %.1f km/h  Max %.0f km/h  %d min</string>
+    <string name="toast_export_error">Export error</string>
+    <string name="desc_export_gpx">Export GPX</string>
+
+    <!-- GpsScreen -->
+    <string name="btn_clear">CLEAR</string>
+    <string name="btn_tracar_rota">GET ROUTE</string>
+    <string name="btn_following">FOLLOWING</string>
+    <string name="btn_follow">FOLLOW</string>
+    <string name="btn_saved_offline">\u2713 Saved</string>
+    <string name="btn_save_offline">Save offline</string>
+    <string name="dialog_download_title">Download offline map</string>
+    <string name="dialog_download_message">Download vector tiles zoom 10 to 15 within a 40km radius around your current position?\n\nRecommended: use Wi-Fi. Vector maps are 5-10x smaller than raster.</string>
+    <string name="dialog_download_name">Map %.4f, %.4f</string>
+
+    <!-- DownloadDialog -->
+    <string name="dialog_downloading">Downloading map...</string>
+    <string name="dialog_download_complete">Download complete!</string>
+    <string name="dialog_download_error">Download error</string>
+    <string name="label_progress_count">%d of %d resources</string>
+    <string name="label_progress_unknown">%d resources downloaded...</string>
+    <string name="label_download_success">%d resources downloaded successfully.</string>
+    <string name="label_download_fail">Failed to download map. Check your connection and try again.</string>
+
+    <!-- CitySearchDialog -->
+    <string name="dialog_city_search">Search city</string>
+    <string name="label_city_name">City name</string>
+
+    <!-- Shared buttons -->
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_download">Download</string>
+
+    <!-- LocationService -->
+    <string name="channel_gps_name">GPS Location</string>
+    <string name="channel_gps_desc">Persistent GPS tracking notification</string>
+    <string name="notification_tracking">Tracking location...</string>
+
+    <!-- GpxExporter -->
+    <string name="title_share_route">Export route via</string>
 </resources>

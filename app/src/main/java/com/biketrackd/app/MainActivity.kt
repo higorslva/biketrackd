@@ -47,10 +47,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.biketrackd.app.data.AppDatabase
+import com.biketrackd.app.R
+import com.biketrackd.app.data.LanguagePreferences
 import com.biketrackd.app.data.OrientationPreferences
 import com.biketrackd.app.data.PedalSession
 import com.biketrackd.app.location.DeviceThermalManager
@@ -70,6 +73,19 @@ import kotlinx.coroutines.launch
 import org.maplibre.android.MapLibre
 
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        val lang = LanguagePreferences.get(newBase)
+        val context = if (lang.isNotEmpty()) {
+            val locale = java.util.Locale(lang)
+            val config = android.content.res.Configuration(newBase.resources.configuration)
+            config.setLocale(locale)
+            newBase.createConfigurationContext(config)
+        } else {
+            newBase
+        }
+        super.attachBaseContext(context)
+    }
 
     private var batteryLevel by mutableIntStateOf(-1)
     private var isBatteryCharging by mutableStateOf(false)
@@ -93,7 +109,7 @@ class MainActivity : ComponentActivity() {
         if (permissions.values.all { it }) {
             // Permissão concedida — onStart() iniciará o service
         } else {
-            Toast.makeText(this, "Permissão GPS necessária", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.toast_gps_permission), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -155,7 +171,7 @@ class MainActivity : ComponentActivity() {
                                     Icon(
                                         imageVector = if (showSidebar) Icons.Default.Close
                                             else Icons.Default.Menu,
-                                        contentDescription = if (showSidebar) "Fechar" else "Menu",
+                                        contentDescription = stringResource(if (showSidebar) R.string.desc_close_sidebar else R.string.desc_open_sidebar),
                                     )
                                 }
                             }
@@ -200,15 +216,12 @@ class MainActivity : ComponentActivity() {
                 pendingSession?.let { summary ->
                     AlertDialog(
                         onDismissRequest = { pendingSession = null },
-                        title = { Text("Salvar sessão?") },
+                        title = { Text(stringResource(R.string.dialog_save_title)) },
                         text = {
                             val km = summary.totalDistance / 1000f
                             val minutes = summary.durationSeconds / 60
                             Text(
-                                "Distância: ${String.format("%.2f", km)} km\n" +
-                                    "Média: ${String.format("%.1f", summary.avgSpeed)} km/h\n" +
-                                    "Max: ${String.format("%.0f", summary.maxSpeed)} km/h\n" +
-                                    "Duração: $minutes min"
+                                stringResource(R.string.dialog_save_message, km, summary.avgSpeed, summary.maxSpeed, minutes)
                             )
                         },
                         confirmButton = {
@@ -229,13 +242,13 @@ class MainActivity : ComponentActivity() {
                                 LocationRepository.addToTotalOdometer(summary.totalDistance)
                                 LocationRepository.resetSession()
                                 pendingSession = null
-                            }) { Text("Salvar") }
+                            }) { Text(stringResource(R.string.btn_save)) }
                         },
                         dismissButton = {
                             TextButton(onClick = {
                                 LocationRepository.resetSession()
                                 pendingSession = null
-                            }) { Text("Descartar") }
+                            }) { Text(stringResource(R.string.btn_discard)) }
                         },
                     )
                 }

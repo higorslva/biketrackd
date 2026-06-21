@@ -22,7 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.biketrackd.app.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -51,7 +53,7 @@ fun CitySearchDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Buscar cidade") },
+        title = { Text(stringResource(R.string.dialog_city_search)) },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
@@ -72,7 +74,7 @@ fun CitySearchDialog(
                             results.clear()
                         }
                     },
-                    label = { Text("Nome da cidade") },
+                    label = { Text(stringResource(R.string.label_city_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -98,7 +100,7 @@ fun CitySearchDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.btn_cancel)) }
         },
     )
 }

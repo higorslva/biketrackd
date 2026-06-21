@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
+import com.biketrackd.app.R
 
 class LocationService : Service() {
 
@@ -66,10 +67,10 @@ class LocationService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Localização GPS",
+                getString(R.string.channel_gps_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Notificação persistente do rastreamento GPS"
+                description = getString(R.string.channel_gps_desc)
                 setShowBadge(false)
             }
             val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -80,7 +81,7 @@ class LocationService : Service() {
     private fun buildNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("BikeTrackd")
-            .setContentText("Rastreando posição...")
+            .setContentText(getString(R.string.notification_tracking))
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)

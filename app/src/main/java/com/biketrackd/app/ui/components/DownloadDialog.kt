@@ -11,7 +11,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.biketrackd.app.R
 import com.biketrackd.app.data.DownloadProgress
 import com.biketrackd.app.data.DownloadProgress.Status
 
@@ -30,9 +32,9 @@ fun DownloadDialog(
         title = {
             Text(
                 text = when (progress.status) {
-                    DownloadProgress.Status.Downloading -> "Baixando mapa..."
-                    DownloadProgress.Status.Completed -> "Download concluído!"
-                    DownloadProgress.Status.Error -> "Erro no download"
+                    DownloadProgress.Status.Downloading -> stringResource(R.string.dialog_downloading)
+                    DownloadProgress.Status.Completed -> stringResource(R.string.dialog_download_complete)
+                    DownloadProgress.Status.Error -> stringResource(R.string.dialog_download_error)
                     DownloadProgress.Status.Idle -> ""
                 },
             )
@@ -42,9 +44,9 @@ fun DownloadDialog(
                 when (progress.status) {
                     DownloadProgress.Status.Downloading -> {
                         val totalText = if (progress.total > 0)
-                            "${progress.current} de ${progress.total} recursos"
+                            stringResource(R.string.label_progress_count, progress.current, progress.total)
                         else
-                            "${progress.current} recursos baixados..."
+                            stringResource(R.string.label_progress_unknown, progress.current)
                         Text(
                             text = totalText,
                             style = MaterialTheme.typography.bodySmall,
@@ -62,11 +64,11 @@ fun DownloadDialog(
                         )
                     }
                     DownloadProgress.Status.Completed -> {
-                        Text("${progress.total} recursos baixados com sucesso.")
+                        Text(stringResource(R.string.label_download_success, progress.total))
                     }
                     DownloadProgress.Status.Error -> {
                         Text(
-                            "Falha ao baixar o mapa. Verifique sua conexão e tente novamente.",
+                            stringResource(R.string.label_download_fail),
                             color = MaterialTheme.colorScheme.error,
                         )
                     }
@@ -76,7 +78,7 @@ fun DownloadDialog(
         },
         confirmButton = {
             androidx.compose.material3.TextButton(onClick = onDismiss) {
-                Text(if (isCompleted || isError) "OK" else "Cancelar")
+                Text(if (isCompleted || isError) stringResource(R.string.btn_ok) else stringResource(R.string.btn_cancel))
             }
         },
     )

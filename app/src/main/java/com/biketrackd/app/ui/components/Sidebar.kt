@@ -21,8 +21,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.biketrackd.app.R
 
 enum class Screen { GPS, SPEEDOMETER, SETTINGS }
 
@@ -42,20 +44,20 @@ fun Sidebar(
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
     ) {
         SidebarButton(
-            icon = { Icon(Icons.Default.Map, contentDescription = "GPS", modifier = Modifier.size(24.dp)) },
-            label = "GPS",
+            icon = { Icon(Icons.Default.Map, contentDescription = stringResource(R.string.desc_sidebar_gps), modifier = Modifier.size(24.dp)) },
+            label = stringResource(R.string.desc_sidebar_gps),
             selected = currentScreen == Screen.GPS,
             onClick = { onScreenSelected(Screen.GPS) },
         )
         SidebarButton(
-            icon = { Icon(Icons.Default.Speed, contentDescription = "PAINEL", modifier = Modifier.size(24.dp)) },
-            label = "PAINEL",
+            icon = { Icon(Icons.Default.Speed, contentDescription = stringResource(R.string.desc_sidebar_panel), modifier = Modifier.size(24.dp)) },
+            label = stringResource(R.string.desc_sidebar_panel),
             selected = currentScreen == Screen.SPEEDOMETER,
             onClick = { onScreenSelected(Screen.SPEEDOMETER) },
         )
         SidebarButton(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "OPÇÕES", modifier = Modifier.size(24.dp)) },
-            label = "OPÇÕES",
+            icon = { Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.desc_sidebar_options), modifier = Modifier.size(24.dp)) },
+            label = stringResource(R.string.desc_sidebar_options),
             selected = currentScreen == Screen.SETTINGS,
             onClick = { onScreenSelected(Screen.SETTINGS) },
         )
