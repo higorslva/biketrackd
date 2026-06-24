@@ -2,6 +2,8 @@ package com.biketrackd.app.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -10,6 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Speed
@@ -26,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.biketrackd.app.R
 
-enum class Screen { GPS, SPEEDOMETER, SETTINGS }
+enum class Screen { GPS, SPEEDOMETER, BIKES, MAINTENANCE, STATISTICS, SETTINGS }
 
 @Composable
 fun Sidebar(
@@ -38,6 +43,7 @@ fun Sidebar(
         modifier = modifier
             .width(80.dp)
             .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
             .background(MaterialTheme.colorScheme.surface)
             .padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -54,6 +60,24 @@ fun Sidebar(
             label = stringResource(R.string.desc_sidebar_panel),
             selected = currentScreen == Screen.SPEEDOMETER,
             onClick = { onScreenSelected(Screen.SPEEDOMETER) },
+        )
+        SidebarButton(
+            icon = { Icon(Icons.Default.DirectionsBike, contentDescription = stringResource(R.string.desc_sidebar_bikes), modifier = Modifier.size(24.dp)) },
+            label = stringResource(R.string.desc_sidebar_bikes),
+            selected = currentScreen == Screen.BIKES,
+            onClick = { onScreenSelected(Screen.BIKES) },
+        )
+        SidebarButton(
+            icon = { Icon(Icons.Default.Build, contentDescription = stringResource(R.string.desc_sidebar_maintenance), modifier = Modifier.size(24.dp)) },
+            label = stringResource(R.string.desc_sidebar_maintenance),
+            selected = currentScreen == Screen.MAINTENANCE,
+            onClick = { onScreenSelected(Screen.MAINTENANCE) },
+        )
+        SidebarButton(
+            icon = { Icon(Icons.Default.Assessment, contentDescription = stringResource(R.string.desc_sidebar_stats), modifier = Modifier.size(24.dp)) },
+            label = stringResource(R.string.desc_sidebar_stats),
+            selected = currentScreen == Screen.STATISTICS,
+            onClick = { onScreenSelected(Screen.STATISTICS) },
         )
         SidebarButton(
             icon = { Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.desc_sidebar_options), modifier = Modifier.size(24.dp)) },

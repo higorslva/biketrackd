@@ -4,8 +4,11 @@
     <string name="app_name">BikeTrackd</string>
 
     <!-- Sidebar -->
+    <string name="desc_sidebar_stats">STATS</string>
     <string name="desc_sidebar_gps">GPS</string>
     <string name="desc_sidebar_panel">DASHBOARD</string>
+    <string name="desc_sidebar_bikes">BIKES</string>
+    <string name="desc_sidebar_maintenance">MAINT.</string>
     <string name="desc_sidebar_options">SETTINGS</string>
 
     <!-- StatusBar -->
@@ -55,7 +58,19 @@
     <string name="stat_best_distance">\ud83d\udd25 Best Distance</string>
     <string name="stat_best_time">\u23f1  Best Time</string>
     <string name="stat_best_avg">\ud83d\udcc8 Best Average</string>
+    <string name="stat_best_max_speed">\ud83d\ude80 Best Max Speed</string>
+    <string name="stat_avg_distance">Avg Distance / Session</string>
+    <string name="stat_avg_time">Avg Time / Session</string>
+    <string name="section_this_month">This Month</string>
+    <string name="section_best_session">Best Session</string>
+    <string name="btn_export_all">Export All</string>
+    <string name="toast_export_all">Data exported</string>
+    <string name="dialog_delete_title">Delete session?</string>
+    <string name="dialog_delete_message">This action cannot be undone.</string>
+    <string name="label_record_on">on %s</string>
     <string name="section_distance_week">Distance per Week</string>
+    <string name="stat_max_speed">\u26a1 Max Speed</string>
+    <string name="btn_delete">Delete</string>
     <string name="section_distance_month">Distance per Month</string>
     <string name="btn_toggle_monthly">Monthly</string>
     <string name="btn_toggle_weekly">Weekly</string>
@@ -82,6 +97,9 @@
     <string name="section_gh">GraphHopper Routes</string>
     <string name="label_gh_desc">API key for A\u2192B navigation (graphhopper.com)</string>
     <string name="label_gh_saved">Saved \u2713</string>
+    <string name="dialog_gh_no_key_title">API Key required</string>
+    <string name="dialog_gh_no_key_message">To use A\u2192B routing, sign up at graphhopper.com and add your API key in Settings.</string>
+    <string name="btn_sign_up">Sign up</string>
     <string name="section_offline_maps">Offline Maps</string>
     <string name="label_no_maps">No saved maps</string>
     <string name="btn_download_city">Download by city</string>
@@ -130,4 +148,42 @@
 
     <!-- GpxExporter -->
     <string name="title_share_route">Export route via</string>
+
+    <!-- BikesScreen -->
+    <string name="section_bikes">My Bikes</string>
+    <string name="label_no_bikes">No bikes registered yet</string>
+    <string name="desc_add_bike">Add bike</string>
+    <string name="title_add_bike">Add Bike</string>
+    <string name="title_edit_bike">Edit Bike</string>
+    <string name="label_bike_name">Name</string>
+    <string name="label_bike_model">Model</string>
+    <string name="label_bike_type">Type</string>
+    <string name="hint_bike_type">e.g. MTB, Road, Hybrid</string>
+    <string name="label_bike_date">Acquisition date</string>
+    <string name="hint_bike_date">dd/mm/aaaa</string>
+    <string name="label_bike_notes">Notes</string>
+    <string name="label_bike_since">Since %s</string>
+    <string name="dialog_delete_bike_title">Delete bike?</string>
+    <string name="dialog_delete_bike_message">Delete "%s" and all its data?</string>
+    <string name="dialog_select_bike_title">Select Bike</string>
+    <string name="label_no_bike_selected">None (generic)</string>
+
+    <!-- MaintenanceScreen -->
+    <string name="section_maintenance">Maintenance</string>
+    <string name="label_no_parts">No maintenance parts registered</string>
+    <string name="desc_add_part">Add part</string>
+    <string name="title_add_part">Add Part</string>
+    <string name="title_edit_part">Edit Part</string>
+    <string name="label_part_name">Part name</string>
+    <string name="label_part_type">Component type</string>
+    <string name="label_lifespan_km">Lifespan (km)</string>
+    <string name="label_used_km">Already used (km)</string>
+    <string name="label_bike">Bike</string>
+    <string name="type_tire">Tire</string>
+    <string name="type_chain">Chain</string>
+    <string name="type_brake_pad">Brake Pad</string>
+    <string name="type_service">General Service</string>
+    <string name="type_other">Other</string>
+    <string name="dialog_delete_part_title">Delete part?</string>
+    <string name="dialog_delete_part_message">Delete "%s"?</string>
 </resources>

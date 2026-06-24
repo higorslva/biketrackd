@@ -36,6 +36,36 @@ interface PedalSessionDao {
     @Query("SELECT COALESCE(MAX(avgSpeed), 0) FROM pedal_history")
     fun getBestAvgSpeedFlow(): Flow<Float>
 
+    @Query("SELECT COALESCE(MAX(maxSpeed), 0) FROM pedal_history")
+    fun getBestMaxSpeedFlow(): Flow<Float>
+
+    // Record session details
+    @Query("SELECT * FROM pedal_history ORDER BY totalDistance DESC LIMIT 1")
+    fun getBestDistanceSessionFlow(): Flow<PedalSession?>
+
+    @Query("SELECT * FROM pedal_history ORDER BY durationSeconds DESC LIMIT 1")
+    fun getBestDurationSessionFlow(): Flow<PedalSession?>
+
+    @Query("SELECT * FROM pedal_history ORDER BY avgSpeed DESC LIMIT 1")
+    fun getBestAvgSpeedSessionFlow(): Flow<PedalSession?>
+
+    @Query("SELECT * FROM pedal_history ORDER BY maxSpeed DESC LIMIT 1")
+    fun getBestMaxSpeedSessionFlow(): Flow<PedalSession?>
+
+    @Query("SELECT * FROM pedal_history ORDER BY totalDistance DESC LIMIT 1")
+    fun getBestSessionFlow(): Flow<PedalSession?>
+
+    // Monthly range queries
+    @Query("SELECT COALESCE(SUM(totalDistance), 0) FROM pedal_history WHERE timestamp >= :startMillis AND timestamp < :endMillis")
+    fun getRangeDistanceFlow(startMillis: Long, endMillis: Long): Flow<Float>
+
+    @Query("SELECT COUNT(*) FROM pedal_history WHERE timestamp >= :startMillis AND timestamp < :endMillis")
+    fun getRangeSessionCountFlow(startMillis: Long, endMillis: Long): Flow<Int>
+
+    // Delete
+    @Query("DELETE FROM pedal_history WHERE id = :id")
+    suspend fun deleteById(id: Long)
+
     // Weekly distances (ISO week, last 8)
     @Query("""
         SELECT strftime('%Y-%W', timestamp / 1000, 'unixepoch') AS week,

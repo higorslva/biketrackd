@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -39,9 +40,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +56,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.R
+import com.biketrackd.app.data.Bike
 import com.biketrackd.app.data.LanguagePreferences
 import com.biketrackd.app.data.OrientationPreferences
 import com.biketrackd.app.data.PedalSession
@@ -63,9 +67,12 @@ import com.biketrackd.app.location.SessionSummary
 import com.biketrackd.app.ui.components.Screen
 import com.biketrackd.app.ui.components.Sidebar
 import com.biketrackd.app.ui.components.StatusBar
+import com.biketrackd.app.ui.screens.BikesScreen
 import com.biketrackd.app.ui.screens.GpsScreen
+import com.biketrackd.app.ui.screens.MaintenanceScreen
 import com.biketrackd.app.ui.screens.SettingsScreen
 import com.biketrackd.app.ui.screens.SpeedometerScreen
+import com.biketrackd.app.ui.screens.StatsScreen
 import com.biketrackd.app.ui.theme.GpsOssTheme
 import com.biketrackd.app.ui.theme.TextPrimary
 import com.biketrackd.app.weather.WeatherRepository
@@ -139,10 +146,20 @@ class MainActivity : ComponentActivity() {
                 var pendingSession by androidx.compose.runtime.remember {
                     mutableStateOf<SessionSummary?>(null)
                 }
+                var selectedBikeId by androidx.compose.runtime.remember {
+                    mutableStateOf<Long?>(null)
+                }
+                var showBikeSelector by androidx.compose.runtime.remember {
+                    mutableStateOf(false)
+                }
                 var showSidebar by androidx.compose.runtime.remember {
                     mutableStateOf(false)
                 }
                 val scope = rememberCoroutineScope()
+                val bikeDao = remember {
+                    AppDatabase.getInstance(this@MainActivity).bikeDao()
+                }
+                val bikes by bikeDao.getAllFlow().collectAsState(initial = emptyList())
 
                 Box(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.fillMaxSize()) {
@@ -154,6 +171,9 @@ class MainActivity : ComponentActivity() {
                                         batteryLevel = batteryLevel,
                                         isBatteryCharging = isBatteryCharging,
                                     )
+                                    Screen.BIKES -> BikesScreen()
+                                    Screen.MAINTENANCE -> MaintenanceScreen()
+                                    Screen.STATISTICS -> StatsScreen()
                                     Screen.SETTINGS -> SettingsScreen()
                                 }
 
@@ -172,16 +192,68 @@ class MainActivity : ComponentActivity() {
                                         imageVector = if (showSidebar) Icons.Default.Close
                                             else Icons.Default.Menu,
                                         contentDescription = stringResource(if (showSidebar) R.string.desc_close_sidebar else R.string.desc_open_sidebar),
+                    )
+                }
+
+                // Bike selector dialog
+                if (showBikeSelector) {
+                    AlertDialog(
+                        onDismissRequest = { showBikeSelector = false },
+                        title = { Text(stringResource(R.string.dialog_select_bike_title)) },
+                        text = {
+                            Column {
+                                bikes.forEach { bike ->
+                                    Text(
+                                        text = bike.name,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                selectedBikeId = bike.id
+                                                showBikeSelector = false
+                                                LocationRepository.startSession()
+                                            }
+                                            .padding(vertical = 12.dp),
                                     )
                                 }
+                                Text(
+                                    text = stringResource(R.string.label_no_bike_selected),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            selectedBikeId = null
+                                            showBikeSelector = false
+                                            LocationRepository.startSession()
+                                        }
+                                        .padding(vertical = 12.dp),
+                                )
                             }
-                        }
+                        },
+                        confirmButton = {},
+                        dismissButton = {
+                            TextButton(onClick = { showBikeSelector = false }) {
+                                Text(stringResource(R.string.btn_cancel))
+                            }
+                        },
+                    )
+                }
+            }
+        }
 
                         if (currentScreen == Screen.GPS) {
                             StatusBar(
                                 batteryLevel = batteryLevel,
                                 isBatteryCharging = isBatteryCharging,
-                                onStartSession = { LocationRepository.startSession() },
+                                onStartSession = {
+                                    if (bikes.isNotEmpty()) {
+                                        showBikeSelector = true
+                                    } else {
+                                        selectedBikeId = null
+                                        LocationRepository.startSession()
+                                    }
+                                },
                                 onStopSession = {
                                     pendingSession = LocationRepository.stopSession()
                                 },
@@ -215,7 +287,10 @@ class MainActivity : ComponentActivity() {
 
                 pendingSession?.let { summary ->
                     AlertDialog(
-                        onDismissRequest = { pendingSession = null },
+                        onDismissRequest = {
+                            pendingSession = null
+                            selectedBikeId = null
+                        },
                         title = { Text(stringResource(R.string.dialog_save_title)) },
                         text = {
                             val km = summary.totalDistance / 1000f
@@ -226,9 +301,9 @@ class MainActivity : ComponentActivity() {
                         },
                         confirmButton = {
                             TextButton(onClick = {
-                                scope.launch {
-                                    AppDatabase.getInstance(this@MainActivity)
-                                        .pedalSessionDao().insert(
+                                    scope.launch {
+                                        val db = AppDatabase.getInstance(this@MainActivity)
+                                        db.pedalSessionDao().insert(
                                             PedalSession(
                                                 timestamp = System.currentTimeMillis(),
                                                 totalDistance = summary.totalDistance,
@@ -236,17 +311,23 @@ class MainActivity : ComponentActivity() {
                                                 avgSpeed = summary.avgSpeed,
                                                 durationSeconds = summary.durationSeconds,
                                                 trailData = LocationRepository.trailToJson(),
+                                                bikeId = selectedBikeId,
                                             )
                                         )
-                                }
+                                        selectedBikeId?.let { bikeId ->
+                                            db.maintenancePartDao().addKmToBikeParts(bikeId, summary.totalDistance)
+                                        }
+                                    }
                                 LocationRepository.addToTotalOdometer(summary.totalDistance)
                                 LocationRepository.resetSession()
+                                selectedBikeId = null
                                 pendingSession = null
                             }) { Text(stringResource(R.string.btn_save)) }
                         },
                         dismissButton = {
                             TextButton(onClick = {
                                 LocationRepository.resetSession()
+                                selectedBikeId = null
                                 pendingSession = null
                             }) { Text(stringResource(R.string.btn_discard)) }
                         },

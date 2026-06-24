@@ -51,6 +51,7 @@ import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.ui.components.DownloadDialog
 import com.biketrackd.app.ui.theme.Green500
 import com.biketrackd.app.ui.theme.TextPrimary
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -78,11 +79,14 @@ fun GpsScreen() {
     var followMode by remember { mutableStateOf(true) }
     var isFirstFix by remember { mutableStateOf(true) }
     var showDownloadConfirm by remember { mutableStateOf(false) }
+    var showNoKeyDialog by remember { mutableStateOf(false) }
     var lastResetCount by remember { mutableStateOf(0) }
     var mapStateRef by remember { mutableStateOf<MapLibreMapState?>(null) }
     var mapViewRef by remember { mutableStateOf<MapView?>(null) }
     var destination by remember { mutableStateOf<LatLng?>(null) }
     var routeInfo by remember { mutableStateOf<RouteInfo?>(null) }
+    var lastRouteOrigin by remember { mutableStateOf<LatLng?>(null) }
+    var lastRouteFetchTime by remember { mutableStateOf(0L) }
 
     if (state.resetCount != lastResetCount) {
         lastResetCount = state.resetCount
@@ -104,6 +108,52 @@ fun GpsScreen() {
             ms.style.getSourceAs<GeoJsonSource>("trail")?.setGeoJson(
                 org.maplibre.geojson.FeatureCollection.fromFeatures(emptyList()),
             )
+        }
+    }
+
+    // Auto-reroute when user deviates from the planned route
+    LaunchedEffect(destination != null) {
+        if (destination == null || mapStateRef == null) return@LaunchedEffect
+
+        while (true) {
+            delay(5_000)
+            if (routeInfo == null) continue
+            if (!state.hasFix) continue
+
+            val apiKey = GraphHopperPreferences.getApiKey(context)
+            if (apiKey.isBlank()) continue
+
+            val currentPos = LatLng(state.latitude, state.longitude)
+            val lastOrigin = lastRouteOrigin ?: continue
+            if (currentPos.distanceTo(lastOrigin) < 50.0) continue
+
+            val now = System.currentTimeMillis()
+            if (now - lastRouteFetchTime < 10_000) continue
+
+            GraphHopperClient.getRoute(
+                apiKey = apiKey,
+                originLat = state.latitude,
+                originLon = state.longitude,
+                destLat = destination!!.latitude,
+                destLon = destination!!.longitude,
+            ).onSuccess { newRoute ->
+                routeInfo = newRoute
+                lastRouteOrigin = LatLng(state.latitude, state.longitude)
+                lastRouteFetchTime = System.currentTimeMillis()
+                val coords = newRoute.points.map {
+                    Point.fromLngLat(it.longitude, it.latitude)
+                }
+                val lineString = if (coords.isNotEmpty())
+                    LineString.fromLngLats(coords) else null
+                if (lineString != null) {
+                    mapStateRef?.style?.getSourceAs<GeoJsonSource>("route")
+                        ?.setGeoJson(Feature.fromGeometry(lineString))
+                    mapStateRef?.style?.getLayerAs<LineLayer>("route-layer")
+                        ?.setProperties(
+                            PropertyFactory.visibility(Property.VISIBLE),
+                        )
+                }
+            }
         }
     }
 
@@ -149,7 +199,12 @@ fun GpsScreen() {
                             isLogoEnabled = false
                         }
 
-                        map.setStyle(MapOfflineManager.OPENFREEMAP_STYLE) { style ->
+                        val cachedStyleFile = java.io.File(ctx.cacheDir, "map_style.json")
+
+                        map.setStyle(
+                            if (cachedStyleFile.exists()) "file://${cachedStyleFile.absolutePath}"
+                            else MapOfflineManager.OPENFREEMAP_STYLE,
+                        ) { style ->
                             style.addSource(GeoJsonSource("trail"))
                             style.addLayer(
                                 LineLayer("trail-layer", "trail").apply {
@@ -215,6 +270,17 @@ fun GpsScreen() {
                             mapStateRef = MapLibreMapState(map, style)
                         }
 
+                        if (!cachedStyleFile.exists()) {
+                            kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                try {
+                                    val json = java.net.URL(MapOfflineManager.OPENFREEMAP_STYLE)
+                                        .openStream().bufferedReader().use { it.readText() }
+                                    cachedStyleFile.writeText(json)
+                                } catch (_: Exception) {
+                                }
+                            }
+                        }
+
                         map.addOnMapLongClickListener { latLng ->
                             destination = latLng
                             routeInfo = null
@@ -266,7 +332,7 @@ fun GpsScreen() {
                             ms.map.setCameraPosition(
                                 CameraPosition.Builder()
                                     .target(LatLng(state.latitude, state.longitude))
-                                    .zoom(17.0)
+                                    .zoom(15.0)
                                     .build(),
                             )
                             isFirstFix = false
@@ -354,6 +420,8 @@ fun GpsScreen() {
                         onClick = {
                             destination = null
                             routeInfo = null
+                            lastRouteOrigin = null
+                            lastRouteFetchTime = 0L
                             mapStateRef?.style?.getLayerAs<SymbolLayer>("destination-layer")
                                 ?.setProperties(PropertyFactory.visibility(Property.NONE))
                             mapStateRef?.style?.getLayerAs<LineLayer>("route-layer")
@@ -378,6 +446,7 @@ fun GpsScreen() {
                     Button(
                         onClick = {
                             if (apiKey.isBlank()) {
+                                showNoKeyDialog = true
                                 return@Button
                             }
                             val dest = destination ?: return@Button
@@ -390,6 +459,8 @@ fun GpsScreen() {
                                     destLon = dest.longitude,
                                 ).onSuccess { route ->
                                     routeInfo = route
+                                    lastRouteOrigin = LatLng(state.latitude, state.longitude)
+                                    lastRouteFetchTime = System.currentTimeMillis()
                                     val coords = route.points.map {
                                         Point.fromLngLat(it.longitude, it.latitude)
                                     }
@@ -506,6 +577,29 @@ fun GpsScreen() {
                 TextButton(onClick = {
                     showDownloadConfirm = false
                 }) { Text(stringResource(R.string.btn_cancel)) }
+            },
+        )
+    }
+
+    if (showNoKeyDialog) {
+        AlertDialog(
+            onDismissRequest = { showNoKeyDialog = false },
+            title = { Text(stringResource(R.string.dialog_gh_no_key_title)) },
+            text = { Text(stringResource(R.string.dialog_gh_no_key_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showNoKeyDialog = false
+                    val intent = android.content.Intent(
+                        android.content.Intent.ACTION_VIEW,
+                        android.net.Uri.parse("https://graphhopper.com"),
+                    )
+                    context.startActivity(intent)
+                }) { Text(stringResource(R.string.btn_sign_up)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showNoKeyDialog = false }) {
+                    Text(stringResource(R.string.btn_cancel))
+                }
             },
         )
     }

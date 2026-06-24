@@ -24,6 +24,7 @@ object MapOfflineManager {
     private const val MIN_ZOOM = 10.0
     private const val MAX_ZOOM = 15.0
     const val OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty"
+    private const val STYLE_CACHE_FILE = "map_style.json"
 
     private const val PREFS_NAME = "maplibre_offline_meta"
 
@@ -100,6 +101,10 @@ object MapOfflineManager {
                 )
             }
         }
+
+        withContext(Dispatchers.IO) {
+            fetchStyleJson(context)
+        }
     }
 
     fun resetProgress() {
@@ -153,4 +158,23 @@ object MapOfflineManager {
         val radiusKm: Int,
         val createdAt: Long,
     )
+
+    fun getCachedStyleJson(context: Context): String? {
+        return try {
+            val file = java.io.File(context.cacheDir, STYLE_CACHE_FILE)
+            if (file.exists()) file.readText() else null
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun fetchStyleJson(context: Context) {
+        try {
+            val json = java.net.URL(OPENFREEMAP_STYLE).openStream()
+                .bufferedReader().use { it.readText() }
+            val file = java.io.File(context.cacheDir, STYLE_CACHE_FILE)
+            file.writeText(json)
+        } catch (_: Exception) {
+        }
+    }
 }

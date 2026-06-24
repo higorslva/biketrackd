@@ -4,8 +4,11 @@
     <string name="app_name">BikeTrackd</string>
 
     <!-- Sidebar -->
+    <string name="desc_sidebar_stats">ESTAT</string>
     <string name="desc_sidebar_gps">GPS</string>
     <string name="desc_sidebar_panel">PAINEL</string>
+    <string name="desc_sidebar_bikes">BIKES</string>
+    <string name="desc_sidebar_maintenance">MANUT.</string>
     <string name="desc_sidebar_options">OP\u00c7\u00d5ES</string>
 
     <!-- StatusBar -->
@@ -55,7 +58,19 @@
     <string name="stat_best_distance">\ud83d\udd25 Maior Dist\u00e2ncia</string>
     <string name="stat_best_time">\u23f1  Mais Tempo</string>
     <string name="stat_best_avg">\ud83d\udcc8 Melhor M\u00e9dia</string>
+    <string name="stat_best_max_speed">\ud83d\ude80 Maior Vel. M\u00e1x.</string>
+    <string name="stat_avg_distance">M\u00e9dia Dist./Sess\u00e3o</string>
+    <string name="stat_avg_time">M\u00e9dia Tempo/Sess\u00e3o</string>
+    <string name="section_this_month">Este M\u00eas</string>
+    <string name="section_best_session">Melhor Sess\u00e3o</string>
+    <string name="btn_export_all">Exportar Tudo</string>
+    <string name="toast_export_all">Dados exportados</string>
+    <string name="dialog_delete_title">Apagar sess\u00e3o?</string>
+    <string name="dialog_delete_message">Esta a\u00e7\u00e3o n\u00e3o pode ser desfeita.</string>
+    <string name="label_record_on">em %s</string>
     <string name="section_distance_week">Dist\u00e2ncia por Semana</string>
+    <string name="stat_max_speed">\u26a1 Vel. M\u00e1x.</string>
+    <string name="btn_delete">Apagar</string>
     <string name="section_distance_month">Dist\u00e2ncia por M\u00eas</string>
     <string name="btn_toggle_monthly">Mensal</string>
     <string name="btn_toggle_weekly">Semanal</string>
@@ -80,6 +95,9 @@
     <string name="section_gh">Rotas GraphHopper</string>
     <string name="label_gh_desc">Chave da API para navega\u00e7\u00e3o A\u2192B (graphhopper.com)</string>
     <string name="label_gh_saved">Salvo \u2713</string>
+    <string name="dialog_gh_no_key_title">Chave da API necess\u00e1ria</string>
+    <string name="dialog_gh_no_key_message">Para usar rotas A\u2192B, cadastre-se em graphhopper.com e adicione sua chave de API nas Configura\u00e7\u00f5es.</string>
+    <string name="btn_sign_up">Cadastrar</string>
     <string name="section_offline_maps">Mapas Offline</string>
     <string name="label_no_maps">Nenhum mapa salvo</string>
     <string name="btn_download_city">Baixar por cidade</string>
@@ -128,4 +146,42 @@
 
     <!-- GpxExporter -->
     <string name="title_share_route">Exportar rota via</string>
+
+    <!-- BikesScreen -->
+    <string name="section_bikes">Minhas Bikes</string>
+    <string name="label_no_bikes">Nenhuma bike cadastrada</string>
+    <string name="desc_add_bike">Adicionar bike</string>
+    <string name="title_add_bike">Adicionar Bike</string>
+    <string name="title_edit_bike">Editar Bike</string>
+    <string name="label_bike_name">Nome</string>
+    <string name="label_bike_model">Modelo</string>
+    <string name="label_bike_type">Tipo</string>
+    <string name="hint_bike_type">ex: MTB, Estrada, H\u00edbrida</string>
+    <string name="label_bike_date">Data de aquisi\u00e7\u00e3o</string>
+    <string name="hint_bike_date">dd/mm/aaaa</string>
+    <string name="label_bike_notes">Observa\u00e7\u00f5es</string>
+    <string name="label_bike_since">Desde %s</string>
+    <string name="dialog_delete_bike_title">Apagar bike?</string>
+    <string name="dialog_delete_bike_message">Apagar "%s" e todos os seus dados?</string>
+    <string name="dialog_select_bike_title">Selecionar Bike</string>
+    <string name="label_no_bike_selected">Nenhuma (gen\u00e9rica)</string>
+
+    <!-- MaintenanceScreen -->
+    <string name="section_maintenance">Manuten\u00e7\u00e3o</string>
+    <string name="label_no_parts">Nenhuma pe\u00e7a cadastrada</string>
+    <string name="desc_add_part">Adicionar pe\u00e7a</string>
+    <string name="title_add_part">Adicionar Pe\u00e7a</string>
+    <string name="title_edit_part">Editar Pe\u00e7a</string>
+    <string name="label_part_name">Nome da pe\u00e7a</string>
+    <string name="label_part_type">Tipo de componente</string>
+    <string name="label_lifespan_km">Vida \u00fatil (km)</string>
+    <string name="label_used_km">J\u00e1 rodou (km)</string>
+    <string name="label_bike">Bicicleta</string>
+    <string name="type_tire">Pneu</string>
+    <string name="type_chain">Corrente</string>
+    <string name="type_brake_pad">Pastilha de Freio</string>
+    <string name="type_service">Revis\u00e3o Geral</string>
+    <string name="type_other">Outro</string>
+    <string name="dialog_delete_part_title">Apagar pe\u00e7a?</string>
+    <string name="dialog_delete_part_message">Apagar "%s"?</string>
 </resources>

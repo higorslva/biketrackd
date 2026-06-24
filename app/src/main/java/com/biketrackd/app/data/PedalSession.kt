@@ -12,6 +12,7 @@ data class PedalSession(
     val avgSpeed: Float,
     val durationSeconds: Long,
     val trailData: String? = null,
+    val bikeId: Long? = null,
 )
 
 data class WeekDist(
