@@ -25,7 +25,7 @@
     <string name="label_warning_eng">ENG</string>
     <string name="label_warning_gps">GPS</string>
     <string name="label_warning_tmp">TMP</string>
-    <string name="warning_speed_limit">\u26a0 BIKE LANE %d %s</string>
+    <string name="warning_speed_limit">\u26a0 BIKE LANE %1$d %2$s</string>
     <string name="label_altitude">ALTITUDE</string>
     <string name="label_grade">GRADE</string>
     <string name="label_max">MAX</string>
@@ -39,7 +39,7 @@
     <string name="desc_close_sidebar">Close</string>
     <string name="desc_open_sidebar">Menu</string>
     <string name="dialog_save_title">Save session?</string>
-    <string name="dialog_save_message">Distance: %.2f km\nAvg: %.1f km/h\nMax: %.0f km/h\nDuration: %d min</string>
+    <string name="dialog_save_message">Distance: %1$.2f km\nAvg: %2$.1f km/h\nMax: %3$.0f km/h\nDuration: %4$d min</string>
     <string name="btn_discard">Discard</string>
 
     <!-- SettingsScreen -->
@@ -75,7 +75,7 @@
     <string name="btn_toggle_monthly">Monthly</string>
     <string name="btn_toggle_weekly">Weekly</string>
     <string name="section_streak">Streak</string>
-    <string name="label_streak">\ud83d\udd25 %d %s in a row</string>
+    <string name="label_streak">\ud83d\udd25 %1$d %2$s in a row</string>
     <string name="label_streak_day">day</string>
     <string name="label_streak_days">days</string>
     <string name="label_last_date">Last: %s</string>
@@ -88,9 +88,14 @@
     <string name="label_metric">Metric (km/h, m, km, \u00b0C)</string>
     <string name="label_imperial">Imperial (mph, ft, mi, \u00b0F)</string>
     <string name="section_orientation">Screen Orientation</string>
+    <string name="orientation_automatic">Automatic</string>
     <string name="label_landscape">Landscape</string>
     <string name="label_portrait">Portrait</string>
     <string name="section_language">Language</string>
+    <string name="section_appearance">Appearance</string>
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
     <string name="label_language_system">System default</string>
     <string name="label_language_pt" translatable="false">Portugu\u00eas</string>
     <string name="label_language_en" translatable="false">English</string>
@@ -107,7 +112,7 @@
     <string name="about_desc">Open-source offline bike computer</string>
     <string name="about_link">github.com/higorslva/biketrackd</string>
     <string name="desc_delete">Delete</string>
-    <string name="label_session_card">Avg %.1f km/h  Max %.0f km/h  %d min</string>
+    <string name="label_session_card">Avg %1$.1f km/h  Max %2$.0f km/h  %3$d min</string>
     <string name="toast_export_error">Export error</string>
     <string name="desc_export_gpx">Export GPX</string>
 
@@ -120,13 +125,13 @@
     <string name="btn_save_offline">Save offline</string>
     <string name="dialog_download_title">Download offline map</string>
     <string name="dialog_download_message">Download vector tiles zoom 10 to 15 within a 40km radius around your current position?\n\nRecommended: use Wi-Fi. Vector maps are 5-10x smaller than raster.</string>
-    <string name="dialog_download_name">Map %.4f, %.4f</string>
+    <string name="dialog_download_name">Map %1$.4f, %2$.4f</string>
 
     <!-- DownloadDialog -->
     <string name="dialog_downloading">Downloading map...</string>
     <string name="dialog_download_complete">Download complete!</string>
     <string name="dialog_download_error">Download error</string>
-    <string name="label_progress_count">%d of %d resources</string>
+    <string name="label_progress_count">%1$d of %2$d resources</string>
     <string name="label_progress_unknown">%d resources downloaded...</string>
     <string name="label_download_success">%d resources downloaded successfully.</string>
     <string name="label_download_fail">Failed to download map. Check your connection and try again.</string>
@@ -186,4 +191,21 @@
     <string name="type_other">Other</string>
     <string name="dialog_delete_part_title">Delete part?</string>
     <string name="dialog_delete_part_message">Delete "%s"?</string>
+    <string name="warning_worn_parts">%d part(s) need replacement soon</string>
+
+    <!-- Backup -->
+    <string name="btn_backup">Backup</string>
+    <string name="btn_restore">Restore</string>
+    <string name="toast_backup_done">Backup saved!</string>
+    <string name="toast_restore_done">Data restored!</string>
+    <string name="toast_restore_error">Restore error: %s</string>
+    <string name="section_backup_restore">Backup &amp; Restore</string>
+    <string name="label_backup_desc">Export all data (bikes, maintenance, sessions, preferences) as JSON</string>
+    <string name="label_restore_desc">Import all data from a JSON backup file (append mode)</string>
+
+    <!-- StatsScreen chart -->
+    <string name="section_avg_speed_chart">Avg Speed per Session</string>
+    <string name="section_max_speed_chart">Max Speed per Session</string>
+    <string name="btn_show_max_speed">Show Max</string>
+    <string name="btn_show_avg_speed">Show Avg</string>
 </resources>

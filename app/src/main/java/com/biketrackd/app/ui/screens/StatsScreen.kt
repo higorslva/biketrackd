@@ -48,6 +48,7 @@ import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.PedalSession
 import com.biketrackd.app.data.UnitFormatter
 import com.biketrackd.app.data.UnitPreferences
+import com.biketrackd.app.ui.components.LineChart
 import com.biketrackd.app.ui.components.SessionCard
 import com.biketrackd.app.ui.components.StatRow
 import com.biketrackd.app.ui.components.calcStreak
@@ -111,6 +112,7 @@ fun StatsScreen(modifier: Modifier = Modifier) {
 
     val unitSystem by remember { mutableStateOf(UnitPreferences.get(context)) }
     var showWeekly by remember { mutableStateOf(true) }
+    var showAvgSpeedChart by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
 
     // Delete state
@@ -453,6 +455,68 @@ fun StatsScreen(modifier: Modifier = Modifier) {
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                }
+            }
+        }
+
+        // === Speed per session chart section ===
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(if (showAvgSpeedChart) R.string.section_avg_speed_chart else R.string.section_max_speed_chart),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = stringResource(if (showAvgSpeedChart) R.string.btn_show_max_speed else R.string.btn_show_avg_speed),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable { showAvgSpeedChart = !showAvgSpeedChart },
+                )
+            }
+        }
+
+        item {
+            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+        }
+
+        item {
+            val chartSessions = remember(sessions) { sessions.takeLast(15).filter { it.avgSpeed > 0 } }
+            val data = remember(chartSessions, showAvgSpeedChart) {
+                if (chartSessions.isEmpty()) emptyList()
+                else chartSessions.map { s ->
+                    dateLabel(s.timestamp) to if (showAvgSpeedChart) s.avgSpeed else s.maxSpeed
+                }
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    if (data.isNotEmpty()) {
+                        LineChart(
+                            data = data,
+                            color = Color(0xFF2196F3),
+                            modifier = Modifier.fillMaxWidth().height(160.dp),
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.toast_no_session),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 8.dp),
+                        )
+                    }
                 }
             }
         }

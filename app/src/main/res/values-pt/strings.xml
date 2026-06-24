@@ -25,7 +25,7 @@
     <string name="label_warning_eng">ENG</string>
     <string name="label_warning_gps">GPS</string>
     <string name="label_warning_tmp">TMP</string>
-    <string name="warning_speed_limit">\u26a0 CICLOVIA %d %s</string>
+    <string name="warning_speed_limit">\u26a0 CICLOVIA %1$d %2$s</string>
     <string name="label_altitude">ALTITUDE</string>
     <string name="label_grade">INCLINA\u00c7\u00c3O</string>
     <string name="label_max">M\u00c1X</string>
@@ -39,7 +39,7 @@
     <string name="desc_close_sidebar">Fechar</string>
     <string name="desc_open_sidebar">Menu</string>
     <string name="dialog_save_title">Salvar sess\u00e3o?</string>
-    <string name="dialog_save_message">Dist\u00e2ncia: %.2f km\nM\u00e9dia: %.1f km/h\nMax: %.0f km/h\nDura\u00e7\u00e3o: %d min</string>
+    <string name="dialog_save_message">Dist\u00e2ncia: %1$.2f km\nM\u00e9dia: %2$.1f km/h\nMax: %3$.0f km/h\nDura\u00e7\u00e3o: %4$d min</string>
     <string name="btn_discard">Descartar</string>
 
     <!-- SettingsScreen -->
@@ -75,7 +75,7 @@
     <string name="btn_toggle_monthly">Mensal</string>
     <string name="btn_toggle_weekly">Semanal</string>
     <string name="section_streak">Sequ\u00eancia</string>
-    <string name="label_streak">\ud83d\udd25 %d %s consecutivos</string>
+    <string name="label_streak">\ud83d\udd25 %1$d %2$s consecutivos</string>
     <string name="label_streak_day">dia</string>
     <string name="label_streak_days">dias</string>
     <string name="label_last_date">\u00daltima: %s</string>
@@ -88,9 +88,14 @@
     <string name="label_metric">M\u00e9trico (km/h, m, km, \u00b0C)</string>
     <string name="label_imperial">Imperial (mph, ft, mi, \u00b0F)</string>
     <string name="section_orientation">Orienta\u00e7\u00e3o da Tela</string>
+    <string name="orientation_automatic">Autom\u00e1tico</string>
     <string name="label_landscape">Paisagem</string>
     <string name="label_portrait">Retrato</string>
     <string name="section_language">Idioma</string>
+    <string name="section_appearance">Apar\u00eancia</string>
+    <string name="theme_system">Padr\u00e3o do sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Escuro</string>
     <string name="label_language_system">Padr\u00e3o do sistema</string>
     <string name="section_gh">Rotas GraphHopper</string>
     <string name="label_gh_desc">Chave da API para navega\u00e7\u00e3o A\u2192B (graphhopper.com)</string>
@@ -105,7 +110,7 @@
     <string name="about_desc">Ciclocomputador offline de c\u00f3digo aberto</string>
     <string name="about_link">github.com/higorslva/biketrackd</string>
     <string name="desc_delete">Apagar</string>
-    <string name="label_session_card">M\u00e9dia %.1f km/h  Max %.0f km/h  %d min</string>
+    <string name="label_session_card">M\u00e9dia %1$.1f km/h  Max %2$.0f km/h  %3$d min</string>
     <string name="toast_export_error">Erro ao exportar</string>
     <string name="desc_export_gpx">Exportar GPX</string>
 
@@ -118,13 +123,13 @@
     <string name="btn_save_offline">Salvar offline</string>
     <string name="dialog_download_title">Baixar mapa offline</string>
     <string name="dialog_download_message">Baixar tiles vectoriais de zoom 10 a 15 num raio de 40km ao redor da sua posi\u00e7\u00e3o atual?\n\nRecomendado: use Wi-Fi. Mapas vectoriais s\u00e3o 5-10x menores que raster.</string>
-    <string name="dialog_download_name">Mapa %.4f, %.4f</string>
+    <string name="dialog_download_name">Mapa %1$.4f, %2$.4f</string>
 
     <!-- DownloadDialog -->
     <string name="dialog_downloading">Baixando mapa...</string>
     <string name="dialog_download_complete">Download conclu\u00eddo!</string>
     <string name="dialog_download_error">Erro no download</string>
-    <string name="label_progress_count">%d de %d recursos</string>
+    <string name="label_progress_count">%1$d de %2$d recursos</string>
     <string name="label_progress_unknown">%d recursos baixados...</string>
     <string name="label_download_success">%d recursos baixados com sucesso.</string>
     <string name="label_download_fail">Falha ao baixar o mapa. Verifique sua conex\u00e3o e tente novamente.</string>
@@ -184,4 +189,21 @@
     <string name="type_other">Outro</string>
     <string name="dialog_delete_part_title">Apagar pe\u00e7a?</string>
     <string name="dialog_delete_part_message">Apagar "%s"?</string>
+    <string name="warning_worn_parts">%d pe\u00e7a(s) precisam ser substitu\u00eddas em breve</string>
+
+    <!-- Backup -->
+    <string name="btn_backup">Exportar</string>
+    <string name="btn_restore">Importar</string>
+    <string name="toast_backup_done">Backup salvo!</string>
+    <string name="toast_restore_done">Dados restaurados!</string>
+    <string name="toast_restore_error">Erro ao restaurar: %s</string>
+    <string name="section_backup_restore">Backup &amp; Restore</string>
+    <string name="label_backup_desc">Exportar todos os dados (bikes, pe\u00e7as, sess\u00f5es, prefer\u00eancias) como JSON</string>
+    <string name="label_restore_desc">Importar todos os dados de um arquivo JSON (modo anexar)</string>
+
+    <!-- StatsScreen chart -->
+    <string name="section_avg_speed_chart">Vel. M\u00e9dia por Sess\u00e3o</string>
+    <string name="section_max_speed_chart">Vel. M\u00e1xima por Sess\u00e3o</string>
+    <string name="btn_show_max_speed">Mostrar M\u00e1x</string>
+    <string name="btn_show_avg_speed">Mostrar M\u00e9dia</string>
 </resources>
