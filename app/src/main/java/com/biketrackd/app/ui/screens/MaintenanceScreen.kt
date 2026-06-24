@@ -4,6 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -97,6 +101,9 @@ fun MaintenanceScreen(modifier: Modifier = Modifier) {
     val allParts by partDao.getAllPartsFlow().collectAsState(initial = emptyList())
     val allBikes by bikeDao.getAllFlow().collectAsState(initial = emptyList())
     val unitSystem by remember { mutableStateOf(UnitPreferences.get(context)) }
+    val wornCount = remember(allParts) {
+        allParts.count { it.lifespanKm > 0f && it.usedKm >= it.lifespanKm * 0.8f }
+    }
 
     var showDialog by remember { mutableStateOf(false) }
     var editingPart by remember { mutableStateOf<MaintenancePart?>(null) }
@@ -154,7 +161,7 @@ fun MaintenanceScreen(modifier: Modifier = Modifier) {
                 ))
             },
             text = {
-                Column {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     OutlinedTextField(
                         value = allBikes.find { it.id == selectedBikeId }?.name ?: "",
                         onValueChange = {},
@@ -291,6 +298,38 @@ fun MaintenanceScreen(modifier: Modifier = Modifier) {
 
             item {
                 HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+            }
+
+            if (wornCount > 0) {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                        ),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.padding(end = 8.dp),
+                            )
+                            Text(
+                                text = stringResource(R.string.warning_worn_parts, wornCount),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                    }
+                }
             }
 
             if (allParts.isEmpty()) {

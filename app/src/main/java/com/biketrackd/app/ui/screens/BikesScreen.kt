@@ -3,6 +3,8 @@ package com.biketrackd.app.ui.screens
 import android.app.DatePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -125,7 +127,7 @@ fun BikesScreen(modifier: Modifier = Modifier) {
             },
             title = { Text(stringResource(if (existing != null) R.string.title_edit_bike else R.string.title_add_bike)) },
             text = {
-                Column {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },

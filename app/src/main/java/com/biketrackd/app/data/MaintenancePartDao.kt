@@ -33,4 +33,10 @@ interface MaintenancePartDao {
 
     @Query("UPDATE maintenance_part SET usedKm = usedKm + :km WHERE bikeId = :bikeId")
     suspend fun addKmToBikeParts(bikeId: Long, km: Float)
+
+    @Query("SELECT COUNT(*) FROM maintenance_part WHERE usedKm >= lifespanKm * 0.8 AND lifespanKm > 0")
+    fun getWornCountFlow(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM maintenance_part WHERE usedKm >= lifespanKm * 0.9 AND lifespanKm > 0")
+    fun getWornCriticalFlow(): Flow<Int>
 }
