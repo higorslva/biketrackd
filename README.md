@@ -4,6 +4,8 @@
 
 # BikeTrackd
 
+[![Made in Brazil](https://selo.feitonobrasil.dev.br/en/custom/1x.svg?feito=%23232324&b=%23009440&r=%23ffcb00&a=%23302681&s=%23ffcb00&i=%23009440&l=%23302681)](https://feitonobrasil.dev.br)
+
 A cycling speedometer and GPS tracker for Android. Built with Jetpack Compose + Material 3, MapLibre GL maps, and Room database.
 
 ## Features
