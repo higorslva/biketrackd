@@ -57,6 +57,7 @@ import com.biketrackd.app.data.GraphHopperPreferences
 import com.biketrackd.app.data.LanguagePreferences
 import com.biketrackd.app.data.MapOfflineManager
 import com.biketrackd.app.data.PedalSession
+import com.biketrackd.app.data.ThemePreferences
 import com.biketrackd.app.data.UnitFormatter
 import com.biketrackd.app.data.UnitPreferences
 import com.biketrackd.app.data.UnitPreferences.UnitSystem
@@ -67,6 +68,9 @@ import com.biketrackd.app.ui.components.DownloadDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.biketrackd.app.data.BackupManager
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -399,6 +403,35 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
+                                orientationPref = Orientation.AUTOMATIC
+                                OrientationPreferences.set(context, Orientation.AUTOMATIC)
+                                (context as? Activity)?.requestedOrientation =
+                                    ActivityInfo.SCREEN_ORIENTATION_USER
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = orientationPref == Orientation.AUTOMATIC,
+                            onClick = {
+                                orientationPref = Orientation.AUTOMATIC
+                                OrientationPreferences.set(context, Orientation.AUTOMATIC)
+                                (context as? Activity)?.requestedOrientation =
+                                    ActivityInfo.SCREEN_ORIENTATION_USER
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = stringResource(R.string.orientation_automatic),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
                                 orientationPref = Orientation.LANDSCAPE
                                 OrientationPreferences.set(context, Orientation.LANDSCAPE)
                                 (context as? Activity)?.requestedOrientation =
@@ -449,6 +482,111 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         )
                         Text(
                             text = stringResource(R.string.label_portrait),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+            }
+        }
+
+        // === Appearance section ===
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+
+        item {
+            Text(
+                text = stringResource(R.string.section_appearance),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+
+        item {
+            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+        }
+
+        item {
+            var themeMode by remember { mutableStateOf(ThemePreferences.get(context)) }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                ThemePreferences.set(context, ThemePreferences.ThemeMode.SYSTEM)
+                                (context as? Activity)?.recreate()
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = themeMode == ThemePreferences.ThemeMode.SYSTEM,
+                            onClick = {
+                                ThemePreferences.set(context, ThemePreferences.ThemeMode.SYSTEM)
+                                (context as? Activity)?.recreate()
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = stringResource(R.string.theme_system),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                ThemePreferences.set(context, ThemePreferences.ThemeMode.LIGHT)
+                                (context as? Activity)?.recreate()
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = themeMode == ThemePreferences.ThemeMode.LIGHT,
+                            onClick = {
+                                ThemePreferences.set(context, ThemePreferences.ThemeMode.LIGHT)
+                                (context as? Activity)?.recreate()
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = stringResource(R.string.theme_light),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                ThemePreferences.set(context, ThemePreferences.ThemeMode.DARK)
+                                (context as? Activity)?.recreate()
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = themeMode == ThemePreferences.ThemeMode.DARK,
+                            onClick = {
+                                ThemePreferences.set(context, ThemePreferences.ThemeMode.DARK)
+                                (context as? Activity)?.recreate()
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            text = stringResource(R.string.theme_dark),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -670,6 +808,101 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
+
+        // === Backup & Restore section ===
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+
+        item {
+            Text(
+                text = stringResource(R.string.section_backup_restore),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+
+        item {
+            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+        }
+
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    val backupLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.CreateDocument("application/json"),
+                    ) { uri ->
+                        if (uri == null) return@rememberLauncherForActivityResult
+                        scope.launch {
+                            try {
+                                val json = BackupManager.export(context)
+                                context.contentResolver.openOutputStream(uri)?.use { os ->
+                                    os.write(json.toByteArray(Charsets.UTF_8))
+                                }
+                                Toast.makeText(context, context.getString(R.string.toast_backup_done), Toast.LENGTH_SHORT).show()
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "${context.getString(R.string.toast_export_error)}: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                    val restoreLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.OpenDocument(),
+                    ) { uri ->
+                        if (uri == null) return@rememberLauncherForActivityResult
+                        scope.launch {
+                            try {
+                                val json = context.contentResolver.openInputStream(uri)?.use { is_
+                                    -> is_.bufferedReader(Charsets.UTF_8).readText()
+                                } ?: throw IllegalStateException("Cannot read file")
+                                BackupManager.import(context, json).getOrThrow()
+                                Toast.makeText(context, context.getString(R.string.toast_restore_done), Toast.LENGTH_SHORT).show()
+                            } catch (e: Exception) {
+                                Toast.makeText(context, context.getString(R.string.toast_restore_error, e.message), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+
+                    Text(
+                        text = stringResource(R.string.label_backup_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = {
+                            backupLauncher.launch("biketrackd_backup.json")
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Text(stringResource(R.string.btn_backup))
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = stringResource(R.string.label_restore_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = {
+                            restoreLauncher.launch(arrayOf("application/json", "*/*"))
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        ),
+                    ) {
+                        Text(stringResource(R.string.btn_restore))
+                    }
+                }
+            }
+        }
 
         // === About section ===
         item {
