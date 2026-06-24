@@ -28,6 +28,7 @@ class LocationService : Service() {
         }
         override fun onProviderDisabled(provider: String) {}
         override fun onProviderEnabled(provider: String) {}
+        @Deprecated("Deprecated in Android API 29", ReplaceWith(""))
         override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) {}
     }
 

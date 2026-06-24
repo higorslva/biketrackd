@@ -56,11 +56,11 @@ object MapOfflineManager {
                     definition,
                     byteArrayOf(),
                     object : OfflineManager.CreateOfflineRegionCallback {
-                        override fun onCreate(region: OfflineRegion) {
-                            val id = region.id
+                        override fun onCreate(offlineRegion: OfflineRegion) {
+                            val id = offlineRegion.id
                             saveMetadata(appCtx, id, name, centerLat, centerLon, radiusKm)
-                            region.setDownloadState(OfflineRegion.STATE_ACTIVE)
-                            region.setObserver(object : OfflineRegion.OfflineRegionObserver {
+                            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+                            offlineRegion.setObserver(object : OfflineRegion.OfflineRegionObserver {
                                 var completed = false
                                 override fun onStatusChanged(status: OfflineRegionStatus) {
                                     if (completed) return
