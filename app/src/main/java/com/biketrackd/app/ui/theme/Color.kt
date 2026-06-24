@@ -16,6 +16,12 @@ val TextPrimary = Color(0xFFFFFFFF)
 val TextSecondary = Color(0xFFB3B3B3)
 val TextTertiary = Color(0xFF808080)
 
+val LightBackground = Color(0xFFF5F5F5)
+val LightSurface = Color(0xFFFFFFFF)
+val LightSurfaceVariant = Color(0xFFE8E8E8)
+val LightOnBackground = Color(0xFF1A1A1A)
+val LightOnSurfaceVariant = Color(0xFF666666)
+
 val SpeedLow = Color(0xFF4CAF50)
 val SpeedMedium = Color(0xFFFF9800)
 val SpeedHigh = Color(0xFFF44336)
