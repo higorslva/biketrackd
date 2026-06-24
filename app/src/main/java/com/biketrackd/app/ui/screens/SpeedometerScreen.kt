@@ -76,6 +76,7 @@ private const val ARC_SWEEP = 270f
 fun SpeedometerScreen(
     batteryLevel: Int = -1,
     isBatteryCharging: Boolean = false,
+    wornCritical: Int = 0,
     modifier: Modifier = Modifier,
 ) {
     val state by LocationRepository.state.collectAsState()
@@ -172,6 +173,14 @@ fun SpeedometerScreen(
                         ThermalLevel.MODERATE, ThermalLevel.HOT, ThermalLevel.CRITICAL
                     ),
                 )
+                if (wornCritical > 0) {
+                    WarningLight(
+                        color = WarningRed,
+                        label = "MR",
+                        blinking = true,
+                        isCritical = true,
+                    )
+                }
             }
 
             Box(
@@ -469,6 +478,14 @@ fun SpeedometerScreen(
                         ThermalLevel.MODERATE, ThermalLevel.HOT, ThermalLevel.CRITICAL
                     ),
                 )
+                if (wornCritical > 0) {
+                    WarningLight(
+                        color = WarningRed,
+                        label = "MR",
+                        blinking = true,
+                        isCritical = true,
+                    )
+                }
             }
 
             // Speedometer arc with digital speed overlaid

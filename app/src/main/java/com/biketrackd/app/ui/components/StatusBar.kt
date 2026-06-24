@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -47,6 +49,8 @@ fun StatusBar(
     isBatteryCharging: Boolean,
     onStartSession: () -> Unit = {},
     onStopSession: () -> Unit = {},
+    showMiniSpeedometer: Boolean = false,
+    onToggleSplit: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val locationState by LocationRepository.state.collectAsState()
@@ -103,79 +107,81 @@ fun StatusBar(
             color = MaterialTheme.colorScheme.onSurface,
         )
 
-        Spacer(modifier = Modifier.width(14.dp))
+        if (!showMiniSpeedometer) {
+            Spacer(modifier = Modifier.width(14.dp))
 
-        Text(
-            text = stringResource(R.string.label_gps),
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
+            Text(
+                text = stringResource(R.string.label_gps),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
 
-        Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(4.dp))
 
-        val gpsBlinking = !locationState.hasFix
-        var dotVisible by remember { mutableStateOf(true) }
-        LaunchedEffect(gpsBlinking) {
-            if (gpsBlinking) {
-                while (true) {
-                    dotVisible = !dotVisible
-                    kotlinx.coroutines.delay(500)
+            val gpsBlinking = !locationState.hasFix
+            var dotVisible by remember { mutableStateOf(true) }
+            LaunchedEffect(gpsBlinking) {
+                if (gpsBlinking) {
+                    while (true) {
+                        dotVisible = !dotVisible
+                        kotlinx.coroutines.delay(500)
+                    }
+                } else {
+                    dotVisible = true
                 }
-            } else {
-                dotVisible = true
             }
+            val dotColor = when {
+                locationState.hasFix -> GpsFix
+                dotVisible -> GpsNoFix
+                else -> Color.Transparent
+            }
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(color = dotColor, shape = CircleShape),
+                content = {},
+            )
+
+            Spacer(modifier = Modifier.width(6.dp))
+
+            Text(
+                text = if (locationState.hasFix) stringResource(R.string.label_gps_ok) else "--",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+
+            Spacer(modifier = Modifier.width(14.dp))
+
+            Text(
+                text = if (locationState.hasFix)
+                    UnitFormatter.formatSpeed(locationState.speedKmh, unitSystem) else "--",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+
+            Spacer(modifier = Modifier.width(14.dp))
+
+            Icon(
+                painter = weatherIconPainter(weather?.weatherCode ?: -1),
+                contentDescription = stringResource(R.string.desc_weather),
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(16.dp),
+            )
+
+            Spacer(modifier = Modifier.width(6.dp))
+
+            Text(
+                text = weather?.let {
+                    UnitFormatter.formatCelsius(Math.round(it.temperature), unitSystem)
+                } ?: "--",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
         }
-        val dotColor = when {
-            locationState.hasFix -> GpsFix
-            dotVisible -> GpsNoFix
-            else -> Color.Transparent
-        }
-        Box(
-            modifier = Modifier
-                .size(12.dp)
-                .background(color = dotColor, shape = CircleShape),
-            content = {},
-        )
-
-        Spacer(modifier = Modifier.width(6.dp))
-
-        Text(
-            text = if (locationState.hasFix) stringResource(R.string.label_gps_ok) else "--",
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-
-        Spacer(modifier = Modifier.width(14.dp))
-
-        Text(
-            text = if (locationState.hasFix)
-                UnitFormatter.formatSpeed(locationState.speedKmh, unitSystem) else "--",
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-
-        Spacer(modifier = Modifier.width(14.dp))
-
-        Icon(
-            painter = weatherIconPainter(weather?.weatherCode ?: -1),
-            contentDescription = stringResource(R.string.desc_weather),
-            tint = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.size(16.dp),
-        )
-
-        Spacer(modifier = Modifier.width(6.dp))
-
-        Text(
-            text = weather?.let {
-                UnitFormatter.formatCelsius(Math.round(it.temperature), unitSystem)
-            } ?: "--",
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
 
         Spacer(modifier = Modifier.width(14.dp))
 
@@ -198,6 +204,25 @@ fun StatusBar(
                     MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            )
+        }
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        Surface(
+            onClick = onToggleSplit,
+            shape = RoundedCornerShape(6.dp),
+            color = if (showMiniSpeedometer)
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                else MaterialTheme.colorScheme.surfaceVariant,
+        ) {
+            Icon(
+                imageVector = Icons.Default.Speed,
+                contentDescription = "Split view",
+                tint = if (showMiniSpeedometer)
+                    MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(6.dp).size(16.dp),
             )
         }
 

@@ -2,19 +2,22 @@ package com.biketrackd.app.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Speed
@@ -36,6 +39,7 @@ enum class Screen { GPS, SPEEDOMETER, BIKES, MAINTENANCE, STATISTICS, SETTINGS }
 @Composable
 fun Sidebar(
     currentScreen: Screen,
+    wornCount: Int = 0,
     onScreenSelected: (Screen) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -62,7 +66,7 @@ fun Sidebar(
             onClick = { onScreenSelected(Screen.SPEEDOMETER) },
         )
         SidebarButton(
-            icon = { Icon(Icons.Default.DirectionsBike, contentDescription = stringResource(R.string.desc_sidebar_bikes), modifier = Modifier.size(24.dp)) },
+            icon = { Icon(Icons.AutoMirrored.Filled.DirectionsBike, contentDescription = stringResource(R.string.desc_sidebar_bikes), modifier = Modifier.size(24.dp)) },
             label = stringResource(R.string.desc_sidebar_bikes),
             selected = currentScreen == Screen.BIKES,
             onClick = { onScreenSelected(Screen.BIKES) },
@@ -72,6 +76,7 @@ fun Sidebar(
             label = stringResource(R.string.desc_sidebar_maintenance),
             selected = currentScreen == Screen.MAINTENANCE,
             onClick = { onScreenSelected(Screen.MAINTENANCE) },
+            badgeCount = wornCount,
         )
         SidebarButton(
             icon = { Icon(Icons.Default.Assessment, contentDescription = stringResource(R.string.desc_sidebar_stats), modifier = Modifier.size(24.dp)) },
@@ -94,29 +99,49 @@ private fun SidebarButton(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
+    badgeCount: Int = 0,
 ) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(12.dp),
-        contentPadding = PaddingValues(8.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.surface,
-            contentColor = if (selected) MaterialTheme.colorScheme.onPrimary
-                else MaterialTheme.colorScheme.onSurface,
-        ),
-        modifier = Modifier.size(64.dp),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+    Box {
+        Button(
+            onClick = onClick,
+            shape = RoundedCornerShape(12.dp),
+            contentPadding = PaddingValues(8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (selected) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.surface,
+                contentColor = if (selected) MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.onSurface,
+            ),
+            modifier = Modifier.size(64.dp),
         ) {
-            icon()
-            Text(
-                text = label,
-                fontSize = 9.sp,
-                maxLines = 1,
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                icon()
+                Text(
+                    text = label,
+                    fontSize = 9.sp,
+                    maxLines = 1,
+                )
+            }
+        }
+        if (badgeCount > 0) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-4).dp, y = 4.dp)
+                    .size(18.dp)
+                    .background(MaterialTheme.colorScheme.error, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = if (badgeCount > 99) "99+" else badgeCount.toString(),
+                    color = MaterialTheme.colorScheme.onError,
+                    fontSize = 10.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                )
+            }
         }
     }
 }

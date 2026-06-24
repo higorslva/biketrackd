@@ -60,6 +60,7 @@ import com.biketrackd.app.data.Bike
 import com.biketrackd.app.data.LanguagePreferences
 import com.biketrackd.app.data.OrientationPreferences
 import com.biketrackd.app.data.PedalSession
+import com.biketrackd.app.data.ThemePreferences
 import com.biketrackd.app.location.DeviceThermalManager
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.location.LocationService
@@ -74,7 +75,6 @@ import com.biketrackd.app.ui.screens.SettingsScreen
 import com.biketrackd.app.ui.screens.SpeedometerScreen
 import com.biketrackd.app.ui.screens.StatsScreen
 import com.biketrackd.app.ui.theme.GpsOssTheme
-import com.biketrackd.app.ui.theme.TextPrimary
 import com.biketrackd.app.weather.WeatherRepository
 import kotlinx.coroutines.launch
 import org.maplibre.android.MapLibre
@@ -132,6 +132,8 @@ class MainActivity : ComponentActivity() {
 
         val orientation = OrientationPreferences.get(this)
         requestedOrientation = when (orientation) {
+            OrientationPreferences.Orientation.AUTOMATIC ->
+                android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER
             OrientationPreferences.Orientation.PORTRAIT ->
                 android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             OrientationPreferences.Orientation.LANDSCAPE ->
@@ -139,7 +141,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            GpsOssTheme {
+            GpsOssTheme(themeMode = ThemePreferences.get(this@MainActivity)) {
                 var currentScreen by androidx.compose.runtime.remember {
                     androidx.compose.runtime.mutableStateOf(Screen.GPS)
                 }
@@ -155,21 +157,32 @@ class MainActivity : ComponentActivity() {
                 var showSidebar by androidx.compose.runtime.remember {
                     mutableStateOf(false)
                 }
+                var showMiniSpeedometer by androidx.compose.runtime.remember {
+                    mutableStateOf(false)
+                }
                 val scope = rememberCoroutineScope()
                 val bikeDao = remember {
                     AppDatabase.getInstance(this@MainActivity).bikeDao()
                 }
                 val bikes by bikeDao.getAllFlow().collectAsState(initial = emptyList())
+                val partDao = remember {
+                    AppDatabase.getInstance(this@MainActivity).maintenancePartDao()
+                }
+                val wornCount by partDao.getWornCountFlow().collectAsState(initial = 0)
+                val wornCritical by partDao.getWornCriticalFlow().collectAsState(initial = 0)
 
-                Box(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         Row(modifier = Modifier.weight(1f)) {
                             Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
                                 when (currentScreen) {
-                                    Screen.GPS -> GpsScreen()
+                                    Screen.GPS -> GpsScreen(showMiniSpeedometer = showMiniSpeedometer)
                                     Screen.SPEEDOMETER -> SpeedometerScreen(
                                         batteryLevel = batteryLevel,
                                         isBatteryCharging = isBatteryCharging,
+                                        wornCritical = wornCritical,
                                     )
                                     Screen.BIKES -> BikesScreen()
                                     Screen.MAINTENANCE -> MaintenanceScreen()
@@ -182,7 +195,7 @@ class MainActivity : ComponentActivity() {
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
-                                        contentColor = TextPrimary,
+                                        contentColor = MaterialTheme.colorScheme.onSurface,
                                     ),
                                     modifier = Modifier
                                         .align(Alignment.TopStart)
@@ -257,6 +270,8 @@ class MainActivity : ComponentActivity() {
                                 onStopSession = {
                                     pendingSession = LocationRepository.stopSession()
                                 },
+                                showMiniSpeedometer = showMiniSpeedometer,
+                                onToggleSplit = { showMiniSpeedometer = !showMiniSpeedometer },
                             )
                         }
                     }
@@ -269,6 +284,7 @@ class MainActivity : ComponentActivity() {
                         Row(modifier = Modifier.fillMaxSize()) {
                             Sidebar(
                                 currentScreen = currentScreen,
+                                wornCount = wornCount,
                                 onScreenSelected = { screen ->
                                     currentScreen = screen
                                     showSidebar = false
@@ -383,6 +399,7 @@ class MainActivity : ComponentActivity() {
                 or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             )
 
+            @Suppress("DEPRECATION")
             decorView.setOnSystemUiVisibilityChangeListener { visibility ->
                 if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
                     decorView.postDelayed({
