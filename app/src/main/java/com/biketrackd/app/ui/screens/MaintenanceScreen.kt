@@ -249,7 +249,7 @@ fun MaintenanceScreen(modifier: Modifier = Modifier) {
                             name = name.trim(),
                             componentType = selectedType,
                             lifespanKm = lifespan.toFloat(),
-                            usedKm = if (existing != null) existing.usedKm else usedKm,
+                            usedKm = usedKm,
                             notes = notes.trim(),
                         )
                         if (existing != null) partDao.update(part)

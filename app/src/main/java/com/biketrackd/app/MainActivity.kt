@@ -331,13 +331,14 @@ class MainActivity : ComponentActivity() {
                                             )
                                         )
                                         selectedBikeId?.let { bikeId ->
-                                            db.maintenancePartDao().addKmToBikeParts(bikeId, summary.totalDistance)
+                                            val km = summary.totalDistance / 1000f
+                                            db.maintenancePartDao().addKmToBikeParts(bikeId, km)
                                         }
+                                        LocationRepository.addToTotalOdometer(summary.totalDistance)
+                                        LocationRepository.resetSession()
+                                        selectedBikeId = null
+                                        pendingSession = null
                                     }
-                                LocationRepository.addToTotalOdometer(summary.totalDistance)
-                                LocationRepository.resetSession()
-                                selectedBikeId = null
-                                pendingSession = null
                             }) { Text(stringResource(R.string.btn_save)) }
                         },
                         dismissButton = {
