@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -97,13 +98,13 @@ fun GpsScreen(showMiniSpeedometer: Boolean = false) {
         isFirstFix = true
     }
 
-    val trailPoints = LocationRepository.trailPoints
+    val trailPoints by remember { derivedStateOf { LocationRepository.trailPoints } }
     val unitSystem = UnitPreferences.get(context)
 
     LaunchedEffect(mapStateRef) {
         val ms = mapStateRef ?: return@LaunchedEffect
         val coords = trailPoints.map { Point.fromLngLat(it.second, it.first) }
-        val trailLineString = if (coords.isNotEmpty()) LineString.fromLngLats(coords) else null
+        val trailLineString = if (coords.size >= 2) LineString.fromLngLats(coords) else null
         if (trailLineString != null) {
             ms.style.getSourceAs<GeoJsonSource>("trail")?.setGeoJson(
                 Feature.fromGeometry(trailLineString),
