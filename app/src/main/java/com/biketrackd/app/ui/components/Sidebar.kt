@@ -97,16 +97,16 @@ fun Sidebar(
             onClick = { onScreenSelected(Screen.STATISTICS) },
         )
         SidebarButton(
-            icon = { Icon(Icons.Default.Info, contentDescription = stringResource(R.string.desc_sidebar_about), modifier = Modifier.size(24.dp)) },
-            label = stringResource(R.string.desc_sidebar_about),
-            selected = currentScreen == Screen.ABOUT,
-            onClick = { onScreenSelected(Screen.ABOUT) },
-        )
-        SidebarButton(
             icon = { Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.desc_sidebar_options), modifier = Modifier.size(24.dp)) },
             label = stringResource(R.string.desc_sidebar_options),
             selected = currentScreen == Screen.SETTINGS,
             onClick = { onScreenSelected(Screen.SETTINGS) },
+        )
+        SidebarButton(
+            icon = { Icon(Icons.Default.Info, contentDescription = stringResource(R.string.desc_sidebar_about), modifier = Modifier.size(24.dp)) },
+            label = stringResource(R.string.desc_sidebar_about),
+            selected = currentScreen == Screen.ABOUT,
+            onClick = { onScreenSelected(Screen.ABOUT) },
         )
     }
 }
