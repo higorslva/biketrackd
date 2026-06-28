@@ -77,6 +77,7 @@ import com.biketrackd.app.ui.screens.GpsScreen
 import com.biketrackd.app.ui.screens.MaintenanceScreen
 import com.biketrackd.app.ui.screens.SettingsScreen
 import com.biketrackd.app.ui.screens.SpeedometerScreen
+import com.biketrackd.app.ui.screens.AboutScreen
 import com.biketrackd.app.ui.screens.StatsScreen
 import com.biketrackd.app.ui.theme.GpsOssTheme
 import com.biketrackd.app.weather.WeatherRepository
@@ -227,6 +228,7 @@ class MainActivity : ComponentActivity() {
                                     Screen.BIKES -> BikesScreen()
                                     Screen.MAINTENANCE -> MaintenanceScreen()
                                     Screen.STATISTICS -> StatsScreen()
+                                    Screen.ABOUT -> AboutScreen()
                                     Screen.SETTINGS -> SettingsScreen()
                                 }
 

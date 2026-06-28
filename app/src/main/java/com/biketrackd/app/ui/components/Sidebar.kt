@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Settings
@@ -38,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.biketrackd.app.R
 
-enum class Screen { GPS, SPEEDOMETER, BIKES, MAINTENANCE, STATISTICS, SETTINGS }
+enum class Screen { GPS, SPEEDOMETER, BIKES, MAINTENANCE, STATISTICS, ABOUT, SETTINGS }
 
 @Composable
 fun Sidebar(
@@ -94,6 +95,12 @@ fun Sidebar(
             label = stringResource(R.string.desc_sidebar_stats),
             selected = currentScreen == Screen.STATISTICS,
             onClick = { onScreenSelected(Screen.STATISTICS) },
+        )
+        SidebarButton(
+            icon = { Icon(Icons.Default.Info, contentDescription = stringResource(R.string.desc_sidebar_about), modifier = Modifier.size(24.dp)) },
+            label = stringResource(R.string.desc_sidebar_about),
+            selected = currentScreen == Screen.ABOUT,
+            onClick = { onScreenSelected(Screen.ABOUT) },
         )
         SidebarButton(
             icon = { Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.desc_sidebar_options), modifier = Modifier.size(24.dp)) },

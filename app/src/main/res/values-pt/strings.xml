@@ -106,9 +106,12 @@
     <string name="section_offline_maps">Mapas Offline</string>
     <string name="label_no_maps">Nenhum mapa salvo</string>
     <string name="btn_download_city">Baixar por cidade</string>
-    <string name="about_title">BikeTrackd v0.3</string>
+    <string name="desc_sidebar_about">SOBRE</string>
+    <string name="about_title">BikeTrackd</string>
     <string name="about_desc">Ciclocomputador offline de c\u00f3digo aberto</string>
     <string name="about_link">github.com/higorslva/biketrackd</string>
+    <string name="about_version">Vers\u00e3o %s</string>
+    <string name="about_license">Licenciado sob GPLv3</string>
     <string name="desc_delete">Apagar</string>
     <string name="label_session_card">M\u00e9dia %1$.1f km/h  Max %2$.0f km/h  %3$d min</string>
     <string name="toast_export_error">Erro ao exportar</string>

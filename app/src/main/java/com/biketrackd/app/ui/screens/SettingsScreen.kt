@@ -1021,46 +1021,6 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        // === About section ===
-        item {
-            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
-        }
-
-        item { Spacer(modifier = Modifier.height(8.dp)) }
-
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                ),
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = stringResource(R.string.about_title),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.about_desc),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Text(
-                        text = "github.com/higorslva/biketrackd",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            }
-        }
-
         item { Spacer(modifier = Modifier.height(16.dp)) }
     }
 

@@ -1,6 +1,11 @@
 import java.io.FileInputStream
 import java.util.Properties
 
+val gitCommitCount = try {
+    Runtime.getRuntime().exec("git rev-list --count HEAD")
+        .inputStream.bufferedReader().readText().trim().toInt()
+} catch (e: Exception) { 1 }
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -15,8 +20,8 @@ android {
         applicationId = "com.biketrackd.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = gitCommitCount
+        versionName = "0.5.${gitCommitCount - 1}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
