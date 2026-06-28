@@ -37,6 +37,51 @@ A cycling speedometer and GPS tracker for Android. Built with Jetpack Compose + 
 - **PAINEL** — speedometer with GPS status, weather, battery, clock; session stats (MAX, TEMPO, DISTÂNCIA)
 - **OPÇÕES** — save/reset session, session history with GPX export, offline map management (list, delete, download by city)
 
+## Screenshots
+
+### Map & Navigation
+
+| Route map (landscape) | Route + Speedometer (landscape) |
+|---|---|
+| ![Route map landscape](images/rota-gps-only-paisagem.png) | ![Route + speedometer landscape](images/rota-gps-velo-paisagem.png) |
+
+| Map + Mini speedometer (portrait) | Map + Mini speedometer (landscape) |
+|---|---|
+| ![Map and speedometer portrait](images/mapa-e-velocimetro-retrato.png) | ![Map and speedometer landscape](images/mapa-e-velocimetro-paisagem.png) |
+
+### Speedometer
+
+| Portrait | Landscape | MR Warning |
+|---|---|---|
+| ![Speedometer portrait](images/velocimetro-retrato.png) | ![Speedometer landscape](images/velocimetro-paisagem.png) | ![MR warning](images/velocimetro-alerta-mr-retrato.png) |
+
+### Bikes & Parts
+
+| Edit bike | Parts list | Add part |
+|---|---|---|
+| ![Edit bike](images/editar-bike-retrato.png) | ![Parts list](images/tela-peças-retrato.png) | ![Add part](images/adicionar-peças-retrato.png) |
+
+| Edit part | Wear alert |
+|---|---|
+| ![Edit part](images/editar-peça-retrato.png) | ![Wear alert](images/alerta-peças-retrato.png) |
+
+### Settings
+
+| Settings |
+|---|
+| ![Settings](images/settings-retrato.png) |
+
+## Dashboard Warnings
+
+| Indicator | Color | Meaning |
+|-----------|-------|---------|
+| **BAT** | Green / Amber / Red | Battery ≥40% / 16–40% / ≤15% (blinking + warning icon) |
+| **ENG** | Green / Amber | Session active / Moving without an active session |
+| **GPS** | Green / Yellow / Red | Position fix acquired / Stationary (<3 km/h) / No fix (blinking) |
+| **TMP** | Green / Amber / Red | Normal / Warm / Hot or critical (blinking + warning icon) |
+| **MR** | Red blinking | Maintenance Required — any part has reached ≥90% wear |
+| **⚠️ BIKE LANE** | Red banner | Speed exceeds the configured bike lane limit |
+
 ## Architecture
 
 ```
