@@ -5,6 +5,8 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import androidx.core.content.ContextCompat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +35,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -72,7 +75,7 @@ import org.maplibre.geojson.LineString
 import org.maplibre.geojson.Point
 
 @Composable
-fun GpsScreen(showMiniSpeedometer: Boolean = false) {
+fun GpsScreen(showMiniSpeedometer: Boolean = false, burnInDimmed: Boolean = false) {
     val state by LocationRepository.state.collectAsState()
     val downloadProgress by MapOfflineManager.progress.collectAsState()
 
@@ -84,6 +87,11 @@ fun GpsScreen(showMiniSpeedometer: Boolean = false) {
     var isFirstFix by remember { mutableStateOf(true) }
     var showDownloadConfirm by remember { mutableStateOf(false) }
     var showNoKeyDialog by remember { mutableStateOf(false) }
+    val routeDimAlpha by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (burnInDimmed) 0.4f else 1f,
+        animationSpec = androidx.compose.animation.core.tween(800),
+        label = "routeDim",
+    )
     var lastResetCount by remember { mutableStateOf(0) }
     var mapStateRef by remember { mutableStateOf<MapLibreMapState?>(null) }
     var mapViewRef by remember { mutableStateOf<MapView?>(null) }
@@ -399,7 +407,8 @@ fun GpsScreen(showMiniSpeedometer: Boolean = false) {
                             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
                             shape = RoundedCornerShape(12.dp),
                         )
-                        .padding(12.dp),
+                        .padding(12.dp)
+                        .alpha(routeDimAlpha),
                 ) {
                     Text(
                         text = "${String.format("%.5f", destination!!.latitude)}, ${String.format("%.5f", destination!!.longitude)}",
@@ -447,7 +456,8 @@ fun GpsScreen(showMiniSpeedometer: Boolean = false) {
                     Column(
                         modifier = Modifier
                             .align(Alignment.BottomStart)
-                            .padding(12.dp),
+                            .padding(12.dp)
+                            .alpha(routeDimAlpha),
                     ) {
                         Button(
                             onClick = {

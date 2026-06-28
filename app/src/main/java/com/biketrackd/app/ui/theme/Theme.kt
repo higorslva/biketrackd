@@ -23,6 +23,22 @@ private val DarkColorScheme = darkColorScheme(
     outline = TextTertiary,
 )
 
+private val BurnInDarkColorScheme = darkColorScheme(
+    primary = Green500,
+    onPrimary = DarkBackground,
+    primaryContainer = Green700,
+    onPrimaryContainer = Green200,
+    secondary = Green400,
+    onSecondary = DarkBackground,
+    background = DarkBackground,
+    onBackground = TextPrimaryDim,
+    surface = DarkSurface,
+    onSurface = TextPrimaryDim,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = TextSecondaryDim,
+    outline = TextTertiary,
+)
+
 private val LightColorScheme = lightColorScheme(
     primary = Green500,
     onPrimary = LightSurface,
@@ -42,6 +58,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun GpsOssTheme(
     themeMode: ThemePreferences.ThemeMode = ThemePreferences.ThemeMode.SYSTEM,
+    burnInEnabled: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val useDark = when (themeMode) {
@@ -49,7 +66,11 @@ fun GpsOssTheme(
         ThemePreferences.ThemeMode.LIGHT -> false
         ThemePreferences.ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
-    val colorScheme = if (useDark) DarkColorScheme else LightColorScheme
+    val colorScheme = when {
+        useDark && burnInEnabled -> BurnInDarkColorScheme
+        useDark -> DarkColorScheme
+        else -> LightColorScheme
+    }
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,

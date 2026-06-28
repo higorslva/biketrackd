@@ -40,7 +40,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -57,6 +60,7 @@ import androidx.lifecycle.lifecycleScope
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.R
 import com.biketrackd.app.data.Bike
+import com.biketrackd.app.data.BurnInPreferences
 import com.biketrackd.app.data.LanguagePreferences
 import com.biketrackd.app.data.OrientationPreferences
 import com.biketrackd.app.data.PedalSession
@@ -76,6 +80,7 @@ import com.biketrackd.app.ui.screens.SpeedometerScreen
 import com.biketrackd.app.ui.screens.StatsScreen
 import com.biketrackd.app.ui.theme.GpsOssTheme
 import com.biketrackd.app.weather.WeatherRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.maplibre.android.MapLibre
 
@@ -141,7 +146,12 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            GpsOssTheme(themeMode = ThemePreferences.get(this@MainActivity)) {
+            val burnInPrefsEnabled = BurnInPreferences.isEnabled(this@MainActivity)
+            val burnInDimText = BurnInPreferences.isDimTextEnabled(this@MainActivity)
+            GpsOssTheme(
+                themeMode = ThemePreferences.get(this@MainActivity),
+                burnInEnabled = burnInPrefsEnabled && burnInDimText,
+            ) {
                 var currentScreen by androidx.compose.runtime.remember {
                     androidx.compose.runtime.mutableStateOf(Screen.GPS)
                 }
@@ -170,15 +180,45 @@ class MainActivity : ComponentActivity() {
                 }
                 val wornCount by partDao.getWornCountFlow().collectAsState(initial = 0)
                 val wornCritical by partDao.getWornCriticalFlow().collectAsState(initial = 0)
+                val locationState by LocationRepository.state.collectAsState()
+                val burnInDimmingEnabled = BurnInPreferences.isDimmingEnabled(this@MainActivity)
+                val burnInActive = burnInPrefsEnabled && burnInDimmingEnabled
+                var lastInteractionMs by remember { mutableStateOf(System.currentTimeMillis()) }
+                var burnInDimmed by remember { mutableStateOf(false) }
+                LaunchedEffect(burnInActive, locationState.isSessionActive) {
+                    if (!burnInActive || !locationState.isSessionActive) {
+                        burnInDimmed = false
+                        return@LaunchedEffect
+                    }
+                    lastInteractionMs = System.currentTimeMillis()
+                    while (true) {
+                        delay(1000)
+                        val elapsed = System.currentTimeMillis() - lastInteractionMs
+                        burnInDimmed = elapsed > 10_000L
+                    }
+                }
 
                 Box(modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)) {
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(burnInActive) {
+                        if (!burnInActive) return@pointerInput
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial)
+                                lastInteractionMs = System.currentTimeMillis()
+                                burnInDimmed = false
+                            }
+                        }
+                    }) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         Row(modifier = Modifier.weight(1f)) {
                             Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
                                 when (currentScreen) {
-                                    Screen.GPS -> GpsScreen(showMiniSpeedometer = showMiniSpeedometer)
+                                    Screen.GPS -> GpsScreen(
+                                        showMiniSpeedometer = showMiniSpeedometer,
+                                        burnInDimmed = burnInDimmed,
+                                    )
                                     Screen.SPEEDOMETER -> SpeedometerScreen(
                                         batteryLevel = batteryLevel,
                                         isBatteryCharging = isBatteryCharging,
@@ -272,6 +312,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 showMiniSpeedometer = showMiniSpeedometer,
                                 onToggleSplit = { showMiniSpeedometer = !showMiniSpeedometer },
+                                burnInDimmed = burnInDimmed,
                             )
                         }
                     }
@@ -289,6 +330,7 @@ class MainActivity : ComponentActivity() {
                                     currentScreen = screen
                                     showSidebar = false
                                 },
+                                burnInDimmed = burnInDimmed,
                             )
                             Box(
                                 modifier = Modifier

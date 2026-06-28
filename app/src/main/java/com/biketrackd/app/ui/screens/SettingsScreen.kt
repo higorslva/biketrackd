@@ -53,6 +53,7 @@ import com.biketrackd.app.data.OrientationPreferences
 import com.biketrackd.app.data.OrientationPreferences.Orientation
 import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.data.AppDatabase
+import com.biketrackd.app.data.BurnInPreferences
 import com.biketrackd.app.data.GraphHopperPreferences
 import com.biketrackd.app.data.LanguagePreferences
 import com.biketrackd.app.data.MapOfflineManager
@@ -589,6 +590,122 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                             text = stringResource(R.string.theme_dark),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+            }
+        }
+
+        // === Burn-in Protection section ===
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+
+        item {
+            Text(
+                text = stringResource(R.string.section_burnin),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+
+        item {
+            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+        }
+
+        item {
+            val burnInEnabled = remember { mutableStateOf(BurnInPreferences.isEnabled(context)) }
+            val dimmingEnabled = remember { mutableStateOf(BurnInPreferences.isDimmingEnabled(context)) }
+            val dimTextEnabled = remember { mutableStateOf(BurnInPreferences.isDimTextEnabled(context)) }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.label_burnin_enable),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = stringResource(R.string.label_burnin_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Switch(
+                            checked = burnInEnabled.value,
+                            onCheckedChange = { checked ->
+                                burnInEnabled.value = checked
+                                BurnInPreferences.setEnabled(context, checked)
+                                (context as? Activity)?.recreate()
+                            },
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.label_burnin_dim),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = stringResource(R.string.label_burnin_dim_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Switch(
+                            checked = dimmingEnabled.value,
+                            onCheckedChange = { checked ->
+                                dimmingEnabled.value = checked
+                                BurnInPreferences.setDimmingEnabled(context, checked)
+                            },
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.label_burnin_dim_text),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = stringResource(R.string.label_burnin_dim_text_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Switch(
+                            checked = dimTextEnabled.value,
+                            onCheckedChange = { checked ->
+                                dimTextEnabled.value = checked
+                                BurnInPreferences.setDimTextEnabled(context, checked)
+                                (context as? Activity)?.recreate()
+                            },
                         )
                     }
                 }

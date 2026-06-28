@@ -208,4 +208,13 @@
     <string name="section_max_speed_chart">Max Speed per Session</string>
     <string name="btn_show_max_speed">Show Max</string>
     <string name="btn_show_avg_speed">Show Avg</string>
+
+    <!-- Burn-in Protection -->
+    <string name="section_burnin">Burn-in Protection</string>
+    <string name="label_burnin_enable">Enable protection</string>
+    <string name="label_burnin_desc">Reduces burn-in risk on AMOLED screens during riding</string>
+    <string name="label_burnin_dim">Auto-dim UI</string>
+    <string name="label_burnin_dim_desc">Dim sidebar, status bar and route card after 10s idle</string>
+    <string name="label_burnin_dim_text">Dim white text</string>
+    <string name="label_burnin_dim_text_desc">Use slightly dimmer white in dark mode to reduce pixel stress</string>
 </resources>

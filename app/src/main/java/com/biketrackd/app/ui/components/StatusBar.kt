@@ -1,5 +1,7 @@
 package com.biketrackd.app.ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
@@ -51,11 +54,17 @@ fun StatusBar(
     onStopSession: () -> Unit = {},
     showMiniSpeedometer: Boolean = false,
     onToggleSplit: () -> Unit = {},
+    burnInDimmed: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val locationState by LocationRepository.state.collectAsState()
     val weather by WeatherRepository.weather.collectAsState()
     val unitSystem = UnitPreferences.get(context = LocalContext.current)
+    val dimAlpha by animateFloatAsState(
+        targetValue = if (burnInDimmed) 0.5f else 1f,
+        animationSpec = tween(800),
+        label = "statusBarDim",
+    )
 
     val batteryText = if (batteryLevel < 0) "--%" else "$batteryLevel%"
 
@@ -88,7 +97,8 @@ fun StatusBar(
             .fillMaxWidth()
             .height(40.dp)
             .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 10.dp),
+            .padding(horizontal = 10.dp)
+            .alpha(dimAlpha),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(

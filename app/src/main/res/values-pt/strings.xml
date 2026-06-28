@@ -206,4 +206,13 @@
     <string name="section_max_speed_chart">Vel. M\u00e1xima por Sess\u00e3o</string>
     <string name="btn_show_max_speed">Mostrar M\u00e1x</string>
     <string name="btn_show_avg_speed">Mostrar M\u00e9dia</string>
+
+    <!-- Burn-in Protection -->
+    <string name="section_burnin">Prote\u00e7\u00e3o AMOLED</string>
+    <string name="label_burnin_enable">Ativar prote\u00e7\u00e3o</string>
+    <string name="label_burnin_desc">Reduz risco de burn-in em telas AMOLED durante o pedal</string>
+    <string name="label_burnin_dim">Escurecer interface</string>
+    <string name="label_burnin_dim_desc">Atenua sidebar, barra de status e cart\u00e3o de rota ap\u00f3s 10s sem toque</string>
+    <string name="label_burnin_dim_text">Escurecer texto branco</string>
+    <string name="label_burnin_dim_text_desc">Usa branco ligeiramente mais escuro no modo noturno para reduzir estresse nos pixels</string>
 </resources>

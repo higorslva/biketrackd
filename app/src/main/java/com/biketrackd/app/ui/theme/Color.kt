@@ -16,6 +16,9 @@ val TextPrimary = Color(0xFFFFFFFF)
 val TextSecondary = Color(0xFFB3B3B3)
 val TextTertiary = Color(0xFF808080)
 
+val TextPrimaryDim = Color(0xFFE0E0E0)
+val TextSecondaryDim = Color(0xFF999999)
+
 val LightBackground = Color(0xFFF5F5F5)
 val LightSurface = Color(0xFFFFFFFF)
 val LightSurfaceVariant = Color(0xFFE8E8E8)
