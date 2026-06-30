@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
 import android.content.res.Configuration
 import com.biketrackd.app.R
+import com.biketrackd.app.data.FontSizePreferences
 import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.data.UnitFormatter
 import com.biketrackd.app.data.UnitPreferences
@@ -93,6 +94,7 @@ fun SpeedometerScreen(
 
     val ctx = LocalContext.current
     val unitSystem = UnitPreferences.get(ctx)
+    val fontScale = FontSizePreferences.getFontScale(ctx)
     val speedLimitEnabled = SpeedLimitPreferences.isEnabled(ctx)
     val speedLimit = SpeedLimitPreferences.getLimit(ctx)
     val speedLimitExceeded = speedLimitEnabled && state.hasFix && animatedSpeed > speedLimit
@@ -197,7 +199,7 @@ fun SpeedometerScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = if (state.hasFix) String.format("%.0f", animatedSpeed) else "--",
-                        fontSize = 72.sp,
+                        fontSize = (72 * fontScale).sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = segmentFont,
                         color = speedColor,
@@ -211,7 +213,7 @@ fun SpeedometerScreen(
                     if (speedLimitExceeded) {
                         Text(
                             text = "\u26A0 CICLOVIA ${UnitFormatter.speedKmhToUnit(speedLimit.toFloat(), unitSystem).toInt()} ${UnitFormatter.speedUnit(unitSystem)}",
-                            fontSize = 9.sp,
+                            fontSize = (9 * fontScale).sp,
                             fontWeight = FontWeight.Bold,
                             color = WarningRed,
                         )
@@ -283,7 +285,7 @@ fun SpeedometerScreen(
                             text = weather?.let {
                                 UnitFormatter.formatCelsius(Math.round(it.temperature), unitSystem)
                             } ?: "--",
-                            fontSize = 16.sp,
+                            fontSize = (16 * fontScale).sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -416,7 +418,7 @@ fun SpeedometerScreen(
                         text = weather?.let {
                             UnitFormatter.formatCelsius(Math.round(it.temperature), unitSystem)
                         } ?: "--",
-                        fontSize = 20.sp,
+                        fontSize = (20 * fontScale).sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -503,7 +505,7 @@ fun SpeedometerScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = if (state.hasFix) String.format("%.0f", animatedSpeed) else "--",
-                        fontSize = 72.sp,
+                        fontSize = (72 * fontScale).sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = segmentFont,
                         color = speedColor,
@@ -517,7 +519,7 @@ fun SpeedometerScreen(
                     if (speedLimitExceeded) {
                         Text(
                             text = stringResource(R.string.warning_speed_limit, UnitFormatter.speedKmhToUnit(speedLimit.toFloat(), unitSystem).toInt(), UnitFormatter.speedUnit(unitSystem)),
-                            fontSize = 9.sp,
+                            fontSize = (9 * fontScale).sp,
                             fontWeight = FontWeight.Bold,
                             color = WarningRed,
                         )
@@ -689,6 +691,7 @@ private fun WarningLight(
     isCritical: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
+    val localFontScale = FontSizePreferences.getFontScale(LocalContext.current)
     var visible by remember { mutableStateOf(true) }
     LaunchedEffect(blinking) {
         if (blinking) {
@@ -722,7 +725,7 @@ private fun WarningLight(
         }
         Text(
             text = label,
-            fontSize = 7.sp,
+            fontSize = (7 * localFontScale).sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
@@ -773,16 +776,17 @@ private fun DataValue(
     valueColor: Color = MaterialTheme.colorScheme.onSurface,
     valueSize: Int = 16,
 ) {
+    val localFontScale = FontSizePreferences.getFontScale(LocalContext.current)
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "$value${if (unit.isNotEmpty()) " $unit" else ""}",
-            fontSize = valueSize.sp,
+            fontSize = (valueSize * localFontScale).sp,
             fontWeight = FontWeight.Bold,
             color = valueColor,
         )
         Text(
             text = label,
-            fontSize = 9.sp,
+            fontSize = (9 * localFontScale).sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }

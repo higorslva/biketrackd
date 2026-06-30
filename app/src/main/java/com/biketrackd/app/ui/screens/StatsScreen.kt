@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import com.biketrackd.app.R
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.PedalSession
+import com.biketrackd.app.data.FontSizePreferences
 import com.biketrackd.app.data.UnitFormatter
 import com.biketrackd.app.data.UnitPreferences
 import com.biketrackd.app.ui.components.LineChart
@@ -64,6 +65,7 @@ import java.util.Locale
 @Composable
 fun StatsScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val fontScale = FontSizePreferences.getFontScale(context)
     val dao = remember { AppDatabase.getInstance(context).pedalSessionDao() }
 
     val sessions by dao.getAllFlow().collectAsState(initial = emptyList())
@@ -402,7 +404,7 @@ fun StatsScreen(modifier: Modifier = Modifier) {
                                     label.substringAfter("-")
                                 Text(
                                     text = display,
-                                    fontSize = 9.sp,
+                                    fontSize = (9 * fontScale).sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }

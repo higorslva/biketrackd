@@ -96,6 +96,8 @@
     <string name="theme_system">System default</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="section_font_size">Font Size</string>
+    <string name="label_font_size">Size</string>
     <string name="label_language_system">System default</string>
     <string name="label_language_pt" translatable="false">Portugu\u00eas</string>
     <string name="label_language_en" translatable="false">English</string>

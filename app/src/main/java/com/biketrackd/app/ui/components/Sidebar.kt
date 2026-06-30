@@ -34,10 +34,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.biketrackd.app.R
+import com.biketrackd.app.data.FontSizePreferences
 
 enum class Screen { GPS, SPEEDOMETER, BIKES, MAINTENANCE, STATISTICS, ABOUT, SETTINGS }
 
@@ -119,6 +121,7 @@ private fun SidebarButton(
     onClick: () -> Unit,
     badgeCount: Int = 0,
 ) {
+    val localFontScale = FontSizePreferences.getFontScale(LocalContext.current)
     Box {
         Button(
             onClick = onClick,
@@ -139,7 +142,7 @@ private fun SidebarButton(
                 icon()
                 Text(
                     text = label,
-                    fontSize = 9.sp,
+                    fontSize = (9 * localFontScale).sp,
                     maxLines = 1,
                 )
             }
@@ -156,7 +159,7 @@ private fun SidebarButton(
                 Text(
                     text = if (badgeCount > 99) "99+" else badgeCount.toString(),
                     color = MaterialTheme.colorScheme.onError,
-                    fontSize = 10.sp,
+                    fontSize = (10 * localFontScale).sp,
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                 )
             }

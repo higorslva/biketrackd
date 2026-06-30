@@ -54,6 +54,7 @@ import com.biketrackd.app.data.OrientationPreferences.Orientation
 import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.BurnInPreferences
+import com.biketrackd.app.data.FontSizePreferences
 import com.biketrackd.app.data.GraphHopperPreferences
 import com.biketrackd.app.data.LanguagePreferences
 import com.biketrackd.app.data.MapOfflineManager
@@ -707,6 +708,72 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                                 (context as? Activity)?.recreate()
                             },
                         )
+                    }
+                }
+            }
+        }
+
+        // === Font Size section ===
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+
+        item {
+            Text(
+                text = stringResource(R.string.section_font_size),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+
+        item {
+            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+        }
+
+        item {
+            var fontScale by remember { mutableStateOf(FontSizePreferences.getFontScale(context)) }
+
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.label_font_size),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = "${String.format("%.1f", fontScale)}x",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Slider(
+                        value = fontScale,
+                        onValueChange = { newScale ->
+                            fontScale = newScale
+                            FontSizePreferences.setFontScale(context, newScale)
+                        },
+                        valueRange = 0.7f..1.5f,
+                        steps = 15,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text("0.7x", style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("1.5x", style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }

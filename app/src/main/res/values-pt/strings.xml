@@ -96,6 +96,8 @@
     <string name="theme_system">Padr\u00e3o do sistema</string>
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Escuro</string>
+    <string name="section_font_size">Tamanho da Fonte</string>
+    <string name="label_font_size">Tamanho</string>
     <string name="label_language_system">Padr\u00e3o do sistema</string>
     <string name="section_gh">Rotas GraphHopper</string>
     <string name="label_gh_desc">Chave da API para navega\u00e7\u00e3o A\u2192B (graphhopper.com)</string>

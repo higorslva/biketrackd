@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import com.biketrackd.app.data.FontSizePreferences
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -129,6 +130,7 @@ private fun arcContent(
     unitSystem: com.biketrackd.app.data.UnitPreferences.UnitSystem,
     segmentFont: FontFamily,
 ) {
+    val localFontScale = FontSizePreferences.getFontScale(LocalContext.current)
     Box(modifier = Modifier.fillMaxSize()) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val strokeWidth = (minOf(size.width, size.height) * 0.08f).coerceIn(4f, 12f)
@@ -165,7 +167,7 @@ private fun arcContent(
         ) {
             Text(
                 text = displaySpeed,
-                        fontSize = 45.sp,
+                        fontSize = (45 * localFontScale).sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = segmentFont,
                 color = speedColor,
