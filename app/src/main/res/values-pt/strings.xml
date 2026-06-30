@@ -145,6 +145,7 @@
 
     <!-- Shared buttons -->
     <string name="btn_save">Salvar</string>
+    <string name="btn_apply">Aplicar</string>
     <string name="btn_cancel">Cancelar</string>
     <string name="btn_ok">OK</string>
     <string name="btn_download">Baixar</string>

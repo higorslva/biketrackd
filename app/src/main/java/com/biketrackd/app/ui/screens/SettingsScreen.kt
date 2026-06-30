@@ -775,6 +775,14 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         Text("1.5x", style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = { (context as? Activity)?.recreate() },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Text(stringResource(R.string.btn_apply))
+                    }
                 }
             }
         }
