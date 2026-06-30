@@ -5,6 +5,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import com.biketrackd.app.data.FontSizePreferences
 import com.biketrackd.app.data.ThemePreferences
 
 private val DarkColorScheme = darkColorScheme(
@@ -71,9 +73,10 @@ fun GpsOssTheme(
         useDark -> DarkColorScheme
         else -> LightColorScheme
     }
+    val fontScale = FontSizePreferences.getFontScale(LocalContext.current)
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = scaledTypography(fontScale),
         content = content,
     )
 }

@@ -6,53 +6,53 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-val Typography = Typography(
+fun scaledTypography(fontScale: Float): Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.Bold,
-        fontSize = 96.sp,
-        lineHeight = 96.sp,
+        fontSize = (96 * fontScale).sp,
+        lineHeight = (96 * fontScale).sp,
         letterSpacing = (-2).sp,
     ),
     displayMedium = TextStyle(
         fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.Bold,
-        fontSize = 48.sp,
-        lineHeight = 52.sp,
+        fontSize = (48 * fontScale).sp,
+        lineHeight = (52 * fontScale).sp,
     ),
     headlineMedium = TextStyle(
         fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,
-        lineHeight = 28.sp,
+        fontSize = (20 * fontScale).sp,
+        lineHeight = (28 * fontScale).sp,
     ),
     titleMedium = TextStyle(
         fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
+        fontSize = (16 * fontScale).sp,
+        lineHeight = (24 * fontScale).sp,
     ),
     titleSmall = TextStyle(
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
+        fontSize = (14 * fontScale).sp,
+        lineHeight = (20 * fontScale).sp,
     ),
     labelLarge = TextStyle(
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
+        fontSize = (14 * fontScale).sp,
+        lineHeight = (20 * fontScale).sp,
     ),
     labelSmall = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
+        fontSize = (11 * fontScale).sp,
+        lineHeight = (16 * fontScale).sp,
     ),
     bodyMedium = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
+        fontSize = (14 * fontScale).sp,
+        lineHeight = (20 * fontScale).sp,
     ),
     bodySmall = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
+        fontSize = (12 * fontScale).sp,
+        lineHeight = (16 * fontScale).sp,
     ),
 )
