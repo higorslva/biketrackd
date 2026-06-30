@@ -24,14 +24,13 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.biketrackd.app.data.FontSizePreferences
+import com.biketrackd.app.ui.LocalFontScale
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -57,7 +56,7 @@ fun LineChart(
         label = "line-progress",
     )
 
-    val fontScale = FontSizePreferences.getFontScale(LocalContext.current)
+    val fontScale = LocalFontScale.current
     val textMeasurer = rememberTextMeasurer()
     val labelStyle = TextStyle(fontSize = (8 * fontScale).sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
     val outlineVariant = MaterialTheme.colorScheme.outlineVariant

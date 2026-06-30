@@ -46,9 +46,9 @@ import androidx.compose.ui.unit.sp
 import com.biketrackd.app.R
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.PedalSession
-import com.biketrackd.app.data.FontSizePreferences
 import com.biketrackd.app.data.UnitFormatter
 import com.biketrackd.app.data.UnitPreferences
+import com.biketrackd.app.ui.LocalFontScale
 import com.biketrackd.app.ui.components.LineChart
 import com.biketrackd.app.ui.components.SessionCard
 import com.biketrackd.app.ui.components.StatRow
@@ -65,7 +65,7 @@ import java.util.Locale
 @Composable
 fun StatsScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val fontScale = FontSizePreferences.getFontScale(context)
+    val fontScale = LocalFontScale.current
     val dao = remember { AppDatabase.getInstance(context).pedalSessionDao() }
 
     val sessions by dao.getAllFlow().collectAsState(initial = emptyList())

@@ -48,13 +48,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
 import android.content.res.Configuration
 import com.biketrackd.app.R
-import com.biketrackd.app.data.FontSizePreferences
 import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.data.UnitFormatter
 import com.biketrackd.app.data.UnitPreferences
 import com.biketrackd.app.location.DeviceThermalManager
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.location.ThermalLevel
+import com.biketrackd.app.ui.LocalFontScale
 import com.biketrackd.app.ui.theme.ArcTrack
 import com.biketrackd.app.ui.theme.Cyan
 import com.biketrackd.app.ui.theme.GpsFix
@@ -94,7 +94,7 @@ fun SpeedometerScreen(
 
     val ctx = LocalContext.current
     val unitSystem = UnitPreferences.get(ctx)
-    val fontScale = FontSizePreferences.getFontScale(ctx)
+    val fontScale = LocalFontScale.current
     val speedLimitEnabled = SpeedLimitPreferences.isEnabled(ctx)
     val speedLimit = SpeedLimitPreferences.getLimit(ctx)
     val speedLimitExceeded = speedLimitEnabled && state.hasFix && animatedSpeed > speedLimit
@@ -691,7 +691,7 @@ private fun WarningLight(
     isCritical: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    val localFontScale = FontSizePreferences.getFontScale(LocalContext.current)
+    val localFontScale = LocalFontScale.current
     var visible by remember { mutableStateOf(true) }
     LaunchedEffect(blinking) {
         if (blinking) {
@@ -776,7 +776,7 @@ private fun DataValue(
     valueColor: Color = MaterialTheme.colorScheme.onSurface,
     valueSize: Int = 16,
 ) {
-    val localFontScale = FontSizePreferences.getFontScale(LocalContext.current)
+    val localFontScale = LocalFontScale.current
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "$value${if (unit.isNotEmpty()) " $unit" else ""}",

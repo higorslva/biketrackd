@@ -40,6 +40,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -61,6 +62,7 @@ import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.R
 import com.biketrackd.app.data.Bike
 import com.biketrackd.app.data.BurnInPreferences
+import com.biketrackd.app.data.FontSizePreferences
 import com.biketrackd.app.data.LanguagePreferences
 import com.biketrackd.app.data.OrientationPreferences
 import com.biketrackd.app.data.PedalSession
@@ -69,6 +71,8 @@ import com.biketrackd.app.location.DeviceThermalManager
 import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.location.LocationService
 import com.biketrackd.app.location.SessionSummary
+import com.biketrackd.app.ui.LocalFontScale
+import com.biketrackd.app.ui.LocalSetFontScale
 import com.biketrackd.app.ui.components.Screen
 import com.biketrackd.app.ui.components.Sidebar
 import com.biketrackd.app.ui.components.StatusBar
@@ -149,11 +153,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             val burnInPrefsEnabled = BurnInPreferences.isEnabled(this@MainActivity)
             val burnInDimText = BurnInPreferences.isDimTextEnabled(this@MainActivity)
-            GpsOssTheme(
-                themeMode = ThemePreferences.get(this@MainActivity),
-                burnInEnabled = burnInPrefsEnabled && burnInDimText,
+            var fontScaleState by remember { mutableStateOf(FontSizePreferences.getFontScale(this@MainActivity)) }
+            val setFontScale: (Float) -> Unit = remember { {
+                FontSizePreferences.setFontScale(this@MainActivity, it)
+                fontScaleState = it
+            } }
+            CompositionLocalProvider(
+                LocalFontScale provides fontScaleState,
+                LocalSetFontScale provides setFontScale,
             ) {
-                var currentScreen by androidx.compose.runtime.remember {
+                GpsOssTheme(
+                    themeMode = ThemePreferences.get(this@MainActivity),
+                    burnInEnabled = burnInPrefsEnabled && burnInDimText,
+                ) {
+                    var currentScreen by androidx.compose.runtime.remember {
                     androidx.compose.runtime.mutableStateOf(Screen.GPS)
                 }
                 var pendingSession by androidx.compose.runtime.remember {
@@ -393,6 +406,7 @@ class MainActivity : ComponentActivity() {
                             }) { Text(stringResource(R.string.btn_discard)) }
                         },
                     )
+                }
                 }
             }
         }

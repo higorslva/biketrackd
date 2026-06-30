@@ -37,17 +37,17 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import com.biketrackd.app.data.FontSizePreferences
 import androidx.compose.ui.res.painterResource
+import com.biketrackd.app.R
+import com.biketrackd.app.data.UnitFormatter
+import com.biketrackd.app.data.UnitPreferences
+import com.biketrackd.app.location.LocationRepository
+import com.biketrackd.app.ui.LocalFontScale
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.biketrackd.app.R
-import com.biketrackd.app.data.UnitFormatter
-import com.biketrackd.app.data.UnitPreferences
-import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.ui.theme.ArcTrack
 import com.biketrackd.app.ui.theme.GpsFix
 import com.biketrackd.app.ui.theme.GpsNoFix
@@ -130,7 +130,7 @@ private fun arcContent(
     unitSystem: com.biketrackd.app.data.UnitPreferences.UnitSystem,
     segmentFont: FontFamily,
 ) {
-    val localFontScale = FontSizePreferences.getFontScale(LocalContext.current)
+    val localFontScale = LocalFontScale.current
     Box(modifier = Modifier.fillMaxSize()) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val strokeWidth = (minOf(size.width, size.height) * 0.08f).coerceIn(4f, 12f)
