@@ -6,6 +6,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,8 +46,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalConfiguration
-import android.content.res.Configuration
 import com.biketrackd.app.R
 import com.biketrackd.app.data.SpeedLimitPreferences
 import com.biketrackd.app.data.UnitFormatter
@@ -124,14 +123,14 @@ fun SpeedometerScreen(
     val showGearWarning = !state.isSessionActive && isMoving && state.hasFix
     val segmentFont = FontFamily(Font(R.font.segment7standard))
 
-    val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
-    if (isPortrait) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        if (maxHeight > maxWidth) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -335,12 +334,12 @@ fun SpeedometerScreen(
                 }
             }
         }
-    } else {
-        Row(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = 48.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 48.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
         ) {
             // === LEFT CLUSTER ===
         Column(
@@ -628,6 +627,7 @@ fun SpeedometerScreen(
                 }
             }
         }
+    }
     }
     }
 }
