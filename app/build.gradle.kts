@@ -1,10 +1,11 @@
 import java.io.FileInputStream
 import java.util.Properties
 
-val gitCommitCount = try {
-    Runtime.getRuntime().exec("git rev-list --count HEAD")
-        .inputStream.bufferedReader().readText().trim().toInt()
-} catch (e: Exception) { 1 }
+val versionProps = Properties().apply {
+    load(rootProject.file("version.txt").inputStream())
+}
+val versionCodeVal = versionProps.getProperty("versionCode", "1").toInt()
+val versionNameVal = versionProps.getProperty("versionName", "0.1.0")
 
 plugins {
     alias(libs.plugins.android.application)
@@ -20,8 +21,8 @@ android {
         applicationId = "com.biketrackd.app"
         minSdk = 21
         targetSdk = 34
-        versionCode = gitCommitCount
-        versionName = "0.6.${gitCommitCount - 1}"
+        versionCode = versionCodeVal
+        versionName = versionNameVal
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

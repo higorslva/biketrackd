@@ -1,0 +1,2 @@
+versionCode=41
+versionName=0.6.40
