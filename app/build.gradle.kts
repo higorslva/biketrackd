@@ -18,10 +18,10 @@ android {
 
     defaultConfig {
         applicationId = "com.biketrackd.app"
-        minSdk = 24
+        minSdk = 21
         targetSdk = 34
         versionCode = gitCommitCount
-        versionName = "0.5.${gitCommitCount - 1}"
+        versionName = "0.6.${gitCommitCount - 1}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
