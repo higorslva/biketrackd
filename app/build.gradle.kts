@@ -61,6 +61,7 @@ android {
     productFlavors {
         create("fdroid") {
             dimension = "store"
+            isDefault = true
         }
     }
 
