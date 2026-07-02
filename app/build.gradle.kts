@@ -100,6 +100,12 @@ android {
     }
 }
 
+afterEvaluate {
+    tasks.matching { it.name.contains("ArtProfile") && it.name.contains("Fdroid") }.configureEach {
+        enabled = false
+    }
+}
+
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
     arg("room.incremental", "true")
