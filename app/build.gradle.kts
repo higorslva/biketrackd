@@ -16,6 +16,7 @@ plugins {
 android {
     namespace = "com.biketrackd.app"
     compileSdk = 34
+    buildToolsVersion = "36.0.0"
 
     defaultConfig {
         applicationId = "com.biketrackd.app"
