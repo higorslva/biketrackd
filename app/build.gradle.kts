@@ -74,6 +74,10 @@ android {
         jvmTarget = "17"
     }
 
+    dependenciesInfo {
+        includeInApk = false
+    }
+
     buildFeatures {
         compose = true
     }
