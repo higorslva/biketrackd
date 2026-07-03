@@ -1,0 +1,6 @@
+- Font size slider in settings with Apply button
+- Monochrome icon for dynamic themes (Android 12+)
+- Orientation detection fix using BoxWithConstraints
+- APKs split by architecture (smaller downloads)
+- Lollipop support (minSdk 21)
+- Bug fixes and performance improvements

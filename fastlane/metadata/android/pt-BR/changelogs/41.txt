@@ -1,0 +1,6 @@
+- Slider de tamanho da fonte nas configurações com botão Aplicar
+- Ícone monocromático para temas dinâmicos (Android 12+)
+- Correção na detecção de orientação com BoxWithConstraints
+- APKs separados por arquitetura (downloads menores)
+- Suporte ao Lollipop (minSdk 21)
+- Correções de bugs e melhorias de desempenho

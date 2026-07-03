@@ -1,0 +1,17 @@
+BikeTrackd is a cycling speedometer and GPS tracker built for Android with Jetpack Compose and Material 3.
+
+Features:
+• Real-time speedometer with animated counter and color gradient (green → yellow → red)
+• GPS map with MapLibre GL, trail tracking, follow mode, and rotation
+• Session recording with distance, max/avg speed, and duration persisted via Room
+• GPX export for any recorded session
+• Current weather display via Open-Meteo API
+• Offline map tiles download (zoom 10–14, 40 km radius)
+• Battery level indicator
+• Metric/imperial unit toggle with live conversion
+• Landscape and portrait optimized layouts
+• Bike and parts management with wear tracking and maintenance alerts
+• Speed limit warning
+• Burn-in protection for OLED screens
+• Adjustable font size
+• Multiple languages (English, Portuguese)

@@ -1,0 +1,17 @@
+BikeTrackd é um velocímetro e GPS tracker para ciclismo desenvolvido para Android com Jetpack Compose e Material 3.
+
+Funcionalidades:
+• Velocímetro em tempo real com contador animado e gradiente de cores (verde → amarelo → vermelho)
+• Mapa GPS com MapLibre GL, gravação de trilha, modo seguir e rotação
+• Gravação de sessões com distância, velocidade máx/média e duração persistidas via Room
+• Exportação GPX para qualquer sessão gravada
+• Exibição da temperatura atual via API Open-Meteo
+• Download de tiles de mapas offline (zoom 10–14, raio 40 km)
+• Indicador de nível da bateria
+• Alternância entre unidades métricas e imperiais com conversão em tempo real
+• Layouts otimizados para retrato e paisagem
+• Gerenciamento de bikes e peças com controle de desgaste e alertas de manutenção
+• Alerta de limite de velocidade
+• Proteção contra burn-in para telas OLED
+• Ajuste de tamanho da fonte
+• Múltiplos idiomas (inglês, português)
