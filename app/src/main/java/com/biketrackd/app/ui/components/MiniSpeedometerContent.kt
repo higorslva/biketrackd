@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.biketrackd.app.R
@@ -57,7 +56,7 @@ import com.biketrackd.app.ui.theme.TextSecondary
 import com.biketrackd.app.weather.WeatherRepository
 
 @Composable
-fun MiniSpeedometerContent(modifier: Modifier = Modifier) {
+fun MiniSpeedometerContent(modifier: Modifier = Modifier, isPortrait: Boolean = true) {
     val state by LocationRepository.state.collectAsState()
     val maxSpeedArc by LocationRepository.maxSpeedArc.collectAsState()
     val weather by WeatherRepository.weather.collectAsState()
@@ -81,13 +80,12 @@ fun MiniSpeedometerContent(modifier: Modifier = Modifier) {
     val displaySpeed = if (animatedSpeed < 0f) "--"
     else String.format("%.0f", UnitFormatter.speedKmhToUnit(animatedSpeed, unitSystem))
 
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        if (maxHeight > maxWidth) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
+    if (isPortrait) {
+        Row(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
+                .padding(horizontal = 12.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(modifier = Modifier.weight(0.5f).fillMaxHeight()) {
@@ -102,7 +100,7 @@ fun MiniSpeedometerContent(modifier: Modifier = Modifier) {
         }
     } else {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
                 .padding(horizontal = 12.dp, vertical = 6.dp),
@@ -118,7 +116,6 @@ fun MiniSpeedometerContent(modifier: Modifier = Modifier) {
                 StatsColumn(state, unitSystem, weather)
             }
         }
-    }
     }
 }
 

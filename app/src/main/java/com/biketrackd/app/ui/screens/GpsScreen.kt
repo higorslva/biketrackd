@@ -1,7 +1,6 @@
 package com.biketrackd.app.ui.screens
 
 import android.content.Context
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import androidx.core.content.ContextCompat
@@ -37,7 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -99,7 +98,6 @@ fun GpsScreen(showMiniSpeedometer: Boolean = false, burnInDimmed: Boolean = fals
     var routeInfo by remember { mutableStateOf<RouteInfo?>(null) }
     var lastRouteOrigin by remember { mutableStateOf<LatLng?>(null) }
     var lastRouteFetchTime by remember { mutableStateOf(0L) }
-    val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
 
     if (state.resetCount != lastResetCount) {
         lastResetCount = state.resetCount
@@ -569,20 +567,29 @@ fun GpsScreen(showMiniSpeedometer: Boolean = false, burnInDimmed: Boolean = fals
         }
     }
 
+    var isPortrait by remember { mutableStateOf(true) }
+
     if (showMiniSpeedometer) {
-        if (isPortrait) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Box(modifier = Modifier.weight(0.65f)) {
-                    mapContent(Modifier.fillMaxSize())
-                }
-                MiniSpeedometerContent(Modifier.weight(0.35f))
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .onSizeChanged { size ->
+                isPortrait = size.height > size.width
             }
-        } else {
-            Row(modifier = Modifier.fillMaxSize()) {
-                Box(modifier = Modifier.weight(0.65f)) {
-                    mapContent(Modifier.fillMaxSize())
+        ) {
+            if (isPortrait) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.weight(0.65f)) {
+                        mapContent(Modifier.fillMaxSize())
+                    }
+                    MiniSpeedometerContent(Modifier.weight(0.35f), isPortrait = true)
                 }
-                MiniSpeedometerContent(Modifier.weight(0.35f))
+            } else {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.weight(0.65f)) {
+                        mapContent(Modifier.fillMaxSize())
+                    }
+                    MiniSpeedometerContent(Modifier.weight(0.35f), isPortrait = false)
+                }
             }
         }
     } else {
