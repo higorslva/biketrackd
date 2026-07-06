@@ -45,33 +45,33 @@ A cycling speedometer and GPS tracker for Android. Built with Jetpack Compose + 
 
 | Route map (landscape) | Route + Speedometer (landscape) |
 |---|---|
-| ![Route map landscape](images/rota-gps-only-paisagem.png) | ![Route + speedometer landscape](images/rota-gps-velo-paisagem.png) |
+| ![Route map landscape](docs/images/rota-gps-only-paisagem.png) | ![Route + speedometer landscape](docs/images/rota-gps-velo-paisagem.png) |
 
 | Map + Mini speedometer (portrait) | Map + Mini speedometer (landscape) |
 |---|---|
-| ![Map and speedometer portrait](images/mapa-e-velocimetro-retrato.png) | ![Map and speedometer landscape](images/mapa-e-velocimetro-paisagem.png) |
+| ![Map and speedometer portrait](docs/images/mapa-e-velocimetro-retrato.png) | ![Map and speedometer landscape](docs/images/mapa-e-velocimetro-paisagem.png) |
 
 ### Speedometer
 
 | Portrait | Landscape | MR Warning |
 |---|---|---|
-| ![Speedometer portrait](images/velocimetro-retrato.png) | ![Speedometer landscape](images/velocimetro-paisagem.png) | ![MR warning](images/velocimetro-alerta-mr-retrato.png) |
+| ![Speedometer portrait](docs/images/velocimetro-retrato.png) | ![Speedometer landscape](docs/images/velocimetro-paisagem.png) | ![MR warning](docs/images/velocimetro-alerta-mr-retrato.png) |
 
 ### Bikes & Parts
 
 | Edit bike | Parts list | Add part |
 |---|---|---|
-| ![Edit bike](images/editar-bike-retrato.png) | ![Parts list](images/tela-peças-retrato.png) | ![Add part](images/adicionar-peças-retrato.png) |
+| ![Edit bike](docs/images/editar-bike-retrato.png) | ![Parts list](docs/images/tela-peças-retrato.png) | ![Add part](docs/images/adicionar-peças-retrato.png) |
 
 | Edit part | Wear alert |
 |---|---|
-| ![Edit part](images/editar-peça-retrato.png) | ![Wear alert](images/alerta-peças-retrato.png) |
+| ![Edit part](docs/images/editar-peça-retrato.png) | ![Wear alert](docs/images/alerta-peças-retrato.png) |
 
 ### Settings
 
 | Settings |
 |---|
-| ![Settings](images/settings-retrato.png) |
+| ![Settings](docs/images/settings-retrato.png) |
 
 ## Dashboard Warnings
 
