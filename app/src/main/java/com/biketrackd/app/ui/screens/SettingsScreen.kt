@@ -897,7 +897,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
         item {
             Text(
-                text = "Rotas GraphHopper",
+                text = stringResource(R.string.section_gh),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -920,7 +920,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Chave da API para navega\u00E7\u00E3o A\u2192B (graphhopper.com)",
+                        text = stringResource(R.string.label_gh_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -928,7 +928,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     OutlinedTextField(
                         value = apiKey,
                         onValueChange = { apiKey = it; saved = false },
-                        label = { Text("GraphHopper API Key") },
+                        label = { Text(stringResource(R.string.label_gh_api_key)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -940,7 +940,10 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         },
                         modifier = Modifier.align(Alignment.End),
                     ) {
-                        Text(if (saved) "Salvo \u2713" else "Salvar")
+                        Text(
+                            if (saved) stringResource(R.string.label_gh_saved)
+                            else stringResource(R.string.btn_save)
+                        )
                     }
                 }
             }

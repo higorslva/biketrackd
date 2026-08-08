@@ -101,6 +101,7 @@
     <string name="label_language_system">Padr\u00e3o do sistema</string>
     <string name="section_gh">Rotas GraphHopper</string>
     <string name="label_gh_desc">Chave da API para navega\u00e7\u00e3o A\u2192B (graphhopper.com)</string>
+    <string name="label_gh_api_key">Chave da API GraphHopper</string>
     <string name="label_gh_saved">Salvo \u2713</string>
     <string name="dialog_gh_no_key_title">Chave da API necess\u00e1ria</string>
     <string name="dialog_gh_no_key_message">Para usar rotas A\u2192B, cadastre-se em graphhopper.com e adicione sua chave de API nas Configura\u00e7\u00f5es.</string>

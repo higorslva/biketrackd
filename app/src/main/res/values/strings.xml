@@ -103,6 +103,7 @@
     <string name="label_language_en" translatable="false">English</string>
     <string name="section_gh">GraphHopper Routes</string>
     <string name="label_gh_desc">API key for A\u2192B navigation (graphhopper.com)</string>
+    <string name="label_gh_api_key">GraphHopper API Key</string>
     <string name="label_gh_saved">Saved \u2713</string>
     <string name="dialog_gh_no_key_title">API Key required</string>
     <string name="dialog_gh_no_key_message">To use A\u2192B routing, sign up at graphhopper.com and add your API key in Settings.</string>
