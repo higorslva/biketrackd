@@ -1,2 +1,2 @@
-versionCode=45
-versionName=0.6.44
+versionCode=51
+versionName=0.7.0
