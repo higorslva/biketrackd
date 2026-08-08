@@ -15,3 +15,9 @@ Features:
 • Burn-in protection for OLED screens
 • Adjustable font size
 • Multiple languages (English, Portuguese)
+
+Network services:
+• Open-Meteo for weather display
+• OpenFreeMap for online map tiles (optional offline downloads available)
+• OpenStreetMap Nominatim for city search
+• GraphHopper for A→B route navigation, using your own free API key (optional; unused without a key)

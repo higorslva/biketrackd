@@ -15,3 +15,9 @@ Funcionalidades:
 • Proteção contra burn-in para telas OLED
 • Ajuste de tamanho da fonte
 • Múltiplos idiomas (inglês, português)
+
+Serviços de rede:
+• Open-Meteo para exibição do clima
+• OpenFreeMap para tiles de mapas online (download offline opcional disponível)
+• OpenStreetMap Nominatim para busca de cidades
+• GraphHopper para navegação de rotas A→B, usando sua própria chave de API gratuita (opcional; não usado sem uma chave)
