@@ -96,7 +96,7 @@ A cycling speedometer and GPS tracker for Android. Built with Jetpack Compose + 
 | **GPS** | Green / Yellow / Red | Position fix acquired / Stationary (<3 km/h) / No fix (blinking) |
 | **TMP** | Green / Amber / Red | Normal / Warm / Moderate, hot or critical (blinking + warning icon) |
 | **MR** | Red blinking | Maintenance Required — any part has reached ≥90% wear |
-| **⚠ CICLOVIA** | Red banner | Speed exceeds the configured bike lane limit |
+| **⚠ BIKE LANE** | Red banner | Speed exceeds the configured bike lane limit |
 
 ## Architecture
 

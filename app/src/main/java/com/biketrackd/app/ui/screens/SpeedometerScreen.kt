@@ -211,7 +211,7 @@ fun SpeedometerScreen(
                     )
                     if (speedLimitExceeded) {
                         Text(
-                            text = "\u26A0 CICLOVIA ${UnitFormatter.speedKmhToUnit(speedLimit.toFloat(), unitSystem).toInt()} ${UnitFormatter.speedUnit(unitSystem)}",
+                            text = stringResource(R.string.warning_speed_limit, UnitFormatter.speedKmhToUnit(speedLimit.toFloat(), unitSystem).toInt(), UnitFormatter.speedUnit(unitSystem)),
                             fontSize = (9 * fontScale).sp,
                             fontWeight = FontWeight.Bold,
                             color = WarningRed,
