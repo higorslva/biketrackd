@@ -1,0 +1,1 @@
+- Aviso de limite de velocidade da ciclovia agora traduzido (era exibido em português em aparelhos em inglês)

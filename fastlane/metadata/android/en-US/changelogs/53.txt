@@ -1,0 +1,1 @@
+- Bike lane speed limit warning now translated (was hardcoded in Portuguese)
