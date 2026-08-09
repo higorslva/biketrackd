@@ -1,0 +1,4 @@
+- Fix GPS trail not rendering during a ride
+- Fix mini speedometer orientation detection
+- GraphHopper settings block now translated
+- Services section added to app description

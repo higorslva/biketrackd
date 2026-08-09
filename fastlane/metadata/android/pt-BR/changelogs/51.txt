@@ -1,0 +1,4 @@
+- Correção do traçado do GPS durante o pedal
+- Correção da orientação do mini velocímetro
+- Bloco de configurações do GraphHopper traduzido
+- Seção de serviços adicionada à descrição do app
