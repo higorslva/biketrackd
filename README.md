@@ -10,6 +10,8 @@ A cycling speedometer and GPS tracker for Android. Built with Jetpack Compose + 
 
 [<img alt="Get it on GitHub" src="https://raw.githubusercontent.com/Kunzisoft/Github-badge/main/get-it-on-github.png" width="240">](https://github.com/higorslva/biketrackd/releases/latest/download/app-fdroid-release.apk)
 
+[<img alt="Get it on GitHub" src="https://f-droid.org/badge/get-it-on.png" width="240">](https://f-droid.org/pt_BR/packages/com.biketrackd.app/)
+
 ## Features
 
 - **Speedometer** — real-time speed with animated counter and color-coded indicator (green → orange → red)
