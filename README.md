@@ -8,7 +8,7 @@
 
 A cycling speedometer and GPS tracker for Android. Built with Jetpack Compose + Material 3, MapLibre GL maps, and Room database.
 
-[<img alt="Get it on GitHub" src="https://raw.githubusercontent.com/Kunzisoft/Github-badge/main/get-it-on-github.png" width="240">](https://github.com/higorslva/biketrackd/releases/latest/download/app-fdroid-release.apk) [<img alt="Get it on GitHub" src="https://f-droid.org/badge/get-it-on.png" width="240">](https://f-droid.org/pt_BR/packages/com.biketrackd.app/)
+[<img alt="Get it on GitHub" src="https://raw.githubusercontent.com/Kunzisoft/Github-badge/main/get-it-on-github.png" width="240">](https://github.com/higorslva/biketrackd/releases/latest/download/app-fdroid-release.apk) [<img alt="Get it on F-Droid" src="https://f-droid.org/badge/get-it-on.png" width="240">](https://f-droid.org/pt_BR/packages/com.biketrackd.app/)
 
 ## Features
 
