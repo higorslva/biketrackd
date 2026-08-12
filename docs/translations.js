@@ -14,7 +14,8 @@ const i18n = {
       badge: "Open Source",
       subtitle: "Seu computador de bike completo,<br>offline e sem anúncios.",
       ctaDownload: "Baixar APK",
-      ctaGithub: "GitHub"
+      ctaGithub: "GitHub",
+      ctaFDroid: "Baixar na F-Droid"
     },
     features: {
       label: "Recursos",
@@ -121,7 +122,8 @@ const i18n = {
       badgeFDroid: "F-Droid",
       text: "BikeTrackd é <strong>100% gratuito e open-source</strong>. Sem anúncios, sem rastreamento, sem taxas. Você pode verificar o código, sugerir mudanças e contribuir com o projeto.",
       ctaGithub: "Ver no GitHub",
-      ctaReleases: "Última versão"
+      ctaReleases: "Última versão",
+      ctaFDroid: "Baixar na F-Droid"
     },
     footer: {
       author: "Autor",
@@ -144,7 +146,8 @@ const i18n = {
       badge: "Open Source",
       subtitle: "Your complete bike computer,<br>offline and ad-free.",
       ctaDownload: "Download APK",
-      ctaGithub: "GitHub"
+      ctaGithub: "GitHub",
+      ctaFDroid: "Get it on F-Droid"
     },
     features: {
       label: "Features",
@@ -251,7 +254,8 @@ const i18n = {
       badgeFDroid: "F-Droid",
       text: "BikeTrackd is <strong>100% free and open-source</strong>. No ads, no tracking, no fees. You can review the code, suggest changes and contribute to the project.",
       ctaGithub: "View on GitHub",
-      ctaReleases: "Latest release"
+      ctaReleases: "Latest release",
+      ctaFDroid: "Get it on F-Droid"
     },
     footer: {
       author: "Author",

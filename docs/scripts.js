@@ -25,6 +25,11 @@ function switchLang(lang) {
     el.innerHTML = val;
   });
 
+  document.querySelectorAll('.fdroid-link').forEach(el => {
+    const locale = lang === 'pt-BR' ? 'pt_BR' : 'en';
+    el.href = 'https://f-droid.org/' + locale + '/packages/com.biketrackd.app/';
+  });
+
   document.querySelectorAll('.lang-option').forEach(el => {
     el.classList.toggle('active', el.getAttribute('data-lang') === lang);
   });
