@@ -35,6 +35,7 @@ object LocationRepository {
     private var contextForPrefs: Context? = null
     private var lastSlowUpdate = 0L
     private var originSet = false
+    private var trailAccumulator = 0f
 
     fun init(context: Context) {
         contextForPrefs = context.applicationContext
@@ -46,6 +47,7 @@ object LocationRepository {
 
     fun startSession() {
         _trailPoints.clear()
+        trailAccumulator = 0f
         previousLocation = null
         sessionStartTime = System.currentTimeMillis()
         lastMovingSecond = 0L
@@ -149,8 +151,14 @@ object LocationRepository {
                 lastMovingSecond = elapsed
             }
 
-            if (_trailPoints.isEmpty() || distanceDelta > TRAIL_MIN_DISTANCE) {
+            if (_trailPoints.isEmpty()) {
                 _trailPoints.add(Pair(location.latitude, location.longitude))
+            } else {
+                trailAccumulator += distanceDelta
+                if (trailAccumulator >= TRAIL_MIN_DISTANCE) {
+                    _trailPoints.add(Pair(location.latitude, location.longitude))
+                    trailAccumulator -= TRAIL_MIN_DISTANCE
+                }
             }
 
             newState = newState.copy(
@@ -206,6 +214,7 @@ object LocationRepository {
 
     fun resetSession() {
         _trailPoints.clear()
+        trailAccumulator = 0f
         originSet = false
         _state.value = _state.value.copy(
             isSessionActive = false,
