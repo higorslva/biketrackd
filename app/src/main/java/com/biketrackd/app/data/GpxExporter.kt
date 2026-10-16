@@ -41,7 +41,7 @@ object GpxExporter {
 
         val header = GPX_HEADER.format(now, name)
         val points = trailPoints.joinToString("\n") { (lat, lon) ->
-            GPX_TRKPT.format(lat, lon)
+            String.format(Locale.US, GPX_TRKPT, lat, lon)
         }
         return "$header\n$points\n$GPX_FOOTER"
     }
