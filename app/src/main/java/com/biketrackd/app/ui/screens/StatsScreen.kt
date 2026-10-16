@@ -51,6 +51,7 @@ import com.biketrackd.app.data.UnitPreferences
 import com.biketrackd.app.ui.LocalFontScale
 import com.biketrackd.app.ui.components.LineChart
 import com.biketrackd.app.ui.components.SessionCard
+import com.biketrackd.app.ui.components.SessionDetailOverlay
 import com.biketrackd.app.ui.components.StatRow
 import com.biketrackd.app.ui.components.calcStreak
 import com.biketrackd.app.ui.components.exportSessionsAsJson
@@ -120,6 +121,11 @@ fun StatsScreen(modifier: Modifier = Modifier) {
     // Delete state
     var sessionToDelete by remember { mutableStateOf<PedalSession?>(null) }
 
+    // Session detail state
+    var viewingSession by remember { mutableStateOf<PedalSession?>(null) }
+    val bikeDao = remember { AppDatabase.getInstance(context).bikeDao() }
+    val bikes by bikeDao.getAllFlow().collectAsState(initial = emptyList())
+
     if (sessionToDelete != null) {
         AlertDialog(
             onDismissRequest = { sessionToDelete = null },
@@ -143,8 +149,9 @@ fun StatsScreen(modifier: Modifier = Modifier) {
         )
     }
 
+    Box(modifier = modifier.fillMaxSize()) {
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
     ) {
@@ -539,7 +546,11 @@ fun StatsScreen(modifier: Modifier = Modifier) {
         }
 
         items(sessions, key = { it.id }) { session ->
-            SessionCard(session, onDelete = { sessionToDelete = session })
+            SessionCard(
+                session,
+                onClick = { viewingSession = session },
+                onDelete = { sessionToDelete = session },
+            )
         }
 
         // === Export All button ===
@@ -559,5 +570,15 @@ fun StatsScreen(modifier: Modifier = Modifier) {
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
+    }
+
+        val detailSession = viewingSession
+        if (detailSession != null) {
+            SessionDetailOverlay(
+                session = detailSession,
+                bikeName = detailSession.bikeId?.let { id -> bikes.find { it.id == id }?.name },
+                onClose = { viewingSession = null },
+            )
+        }
     }
 }

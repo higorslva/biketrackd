@@ -2,6 +2,7 @@ package com.biketrackd.app.ui.components
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,7 +40,11 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun SessionCard(session: PedalSession, onDelete: () -> Unit = {}) {
+fun SessionCard(
+    session: PedalSession,
+    onClick: () -> Unit = {},
+    onDelete: () -> Unit = {},
+) {
     val context = LocalContext.current
     val dateFormat = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
     val dateStr = dateFormat.format(Date(session.timestamp))
@@ -58,7 +63,10 @@ fun SessionCard(session: PedalSession, onDelete: () -> Unit = {}) {
         ),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
@@ -76,20 +84,7 @@ fun SessionCard(session: PedalSession, onDelete: () -> Unit = {}) {
             }
 
             if (!session.trailData.isNullOrBlank()) {
-                IconButton(onClick = {
-                    try {
-                        val arr = JSONArray(session.trailData)
-                        val points = mutableListOf<Pair<Double, Double>>()
-                        for (i in 0 until arr.length()) {
-                            val coord = arr.getJSONArray(i)
-                            points.add(coord.getDouble(0) to coord.getDouble(1))
-                        }
-                        val gpx = GpxExporter.generate(points, session)
-                        GpxExporter.share(context, gpx, session)
-                    } catch (_: Exception) {
-                        Toast.makeText(context, context.getString(R.string.toast_export_error), Toast.LENGTH_SHORT).show()
-                    }
-                }) {
+                IconButton(onClick = { shareSessionGpx(context, session) }) {
                     Icon(
                         Icons.Default.Share,
                         contentDescription = stringResource(R.string.desc_export_gpx),
@@ -139,6 +134,21 @@ fun StatRow(label: String, value: String, subtitle: String? = null) {
                 modifier = Modifier.padding(top = 2.dp),
             )
         }
+    }
+}
+
+fun shareSessionGpx(context: android.content.Context, session: PedalSession) {
+    try {
+        val arr = JSONArray(session.trailData ?: return)
+        val points = mutableListOf<Pair<Double, Double>>()
+        for (i in 0 until arr.length()) {
+            val coord = arr.getJSONArray(i)
+            points.add(coord.getDouble(0) to coord.getDouble(1))
+        }
+        val gpx = GpxExporter.generate(points, session)
+        GpxExporter.share(context, gpx, session)
+    } catch (_: Exception) {
+        Toast.makeText(context, context.getString(R.string.toast_export_error), Toast.LENGTH_SHORT).show()
     }
 }
 

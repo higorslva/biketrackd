@@ -61,6 +61,7 @@
     <string name="stat_best_max_speed">\ud83d\ude80 Maior Vel. M\u00e1x.</string>
     <string name="stat_avg_distance">M\u00e9dia Dist./Sess\u00e3o</string>
     <string name="stat_avg_time">M\u00e9dia Tempo/Sess\u00e3o</string>
+    <string name="stat_duration">Dura\u00e7\u00e3o</string>
     <string name="section_this_month">Este M\u00eas</string>
     <string name="section_best_session">Melhor Sess\u00e3o</string>
     <string name="btn_export_all">Exportar Tudo</string>
@@ -119,6 +120,8 @@
     <string name="label_session_card">M\u00e9dia %1$.1f km/h  Max %2$.0f km/h  %3$d min</string>
     <string name="toast_export_error">Erro ao exportar</string>
     <string name="desc_export_gpx">Exportar GPX</string>
+    <string name="desc_back">Voltar</string>
+    <string name="label_no_trail">Nenhum traçado gravado nesta sessão</string>
 
     <!-- GpsScreen -->
     <string name="btn_clear">LIMPAR</string>

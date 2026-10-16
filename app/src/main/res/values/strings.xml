@@ -61,6 +61,7 @@
     <string name="stat_best_max_speed">\ud83d\ude80 Best Max Speed</string>
     <string name="stat_avg_distance">Avg Distance / Session</string>
     <string name="stat_avg_time">Avg Time / Session</string>
+    <string name="stat_duration">Duration</string>
     <string name="section_this_month">This Month</string>
     <string name="section_best_session">Best Session</string>
     <string name="btn_export_all">Export All</string>
@@ -121,6 +122,8 @@
     <string name="label_session_card">Avg %1$.1f km/h  Max %2$.0f km/h  %3$d min</string>
     <string name="toast_export_error">Export error</string>
     <string name="desc_export_gpx">Export GPX</string>
+    <string name="desc_back">Back</string>
+    <string name="label_no_trail">No track recorded for this session</string>
 
     <!-- GpsScreen -->
     <string name="btn_clear">CLEAR</string>
