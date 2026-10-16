@@ -1,2 +1,2 @@
-versionCode=53
-versionName=0.7.2
+versionCode=54
+versionName=0.7.3
