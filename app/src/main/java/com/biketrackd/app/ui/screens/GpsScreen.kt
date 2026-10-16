@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -73,7 +76,7 @@ import org.maplibre.geojson.LineString
 import org.maplibre.geojson.Point
 
 @Composable
-fun GpsScreen(showMiniSpeedometer: Boolean = false, burnInDimmed: Boolean = false) {
+fun GpsScreen(onMenuClick: () -> Unit, showMiniSpeedometer: Boolean = false, burnInDimmed: Boolean = false) {
     val state by LocationRepository.state.collectAsState()
     val downloadProgress by MapOfflineManager.progress.collectAsState()
 
@@ -377,6 +380,23 @@ fun GpsScreen(showMiniSpeedometer: Boolean = false, burnInDimmed: Boolean = fals
                 },
             )
 
+            Button(
+                onClick = onMenuClick,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(8.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = stringResource(R.string.desc_open_sidebar),
+                )
+            }
+
             if (state.hasOrigin) {
                 Text(
                     text = "\u21A9 ${UnitFormatter.formatLongDistance(state.distanceToOrigin, unitSystem)}",
@@ -399,7 +419,7 @@ fun GpsScreen(showMiniSpeedometer: Boolean = false, burnInDimmed: Boolean = fals
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(top = 12.dp, start = 12.dp)
+                        .padding(top = 56.dp, start = 12.dp)
                         .background(
                             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
                             shape = RoundedCornerShape(12.dp),
@@ -504,23 +524,6 @@ fun GpsScreen(showMiniSpeedometer: Boolean = false, burnInDimmed: Boolean = fals
                         }
                     }
                 }
-            }
-
-            if (state.hasOrigin) {
-                Text(
-                    text = "\u21A9 ${UnitFormatter.formatLongDistance(state.distanceToOrigin, unitSystem)}",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 12.dp, end = 12.dp)
-                        .background(
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
-                            shape = RoundedCornerShape(8.dp),
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                )
             }
 
             Column(

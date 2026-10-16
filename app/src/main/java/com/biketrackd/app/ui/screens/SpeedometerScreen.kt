@@ -19,7 +19,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -74,6 +77,7 @@ private const val ARC_SWEEP = 270f
 
 @Composable
 fun SpeedometerScreen(
+    onMenuClick: () -> Unit,
     batteryLevel: Int = -1,
     isBatteryCharging: Boolean = false,
     wornCritical: Int = 0,
@@ -124,11 +128,28 @@ fun SpeedometerScreen(
     val segmentFont = FontFamily(Font(R.font.segment7standard))
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        Button(
+            onClick = onMenuClick,
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            ),
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(8.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = stringResource(R.string.desc_open_sidebar),
+            )
+        }
         if (maxHeight > maxWidth) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 8.dp),
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 56.dp, bottom = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween,
         ) {

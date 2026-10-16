@@ -103,7 +103,7 @@ fun SessionDetailOverlay(
                 translucent = true,
                 modifier = Modifier
                     .align(Alignment.TopStart)
-                    .padding(start = 52.dp, top = 8.dp, end = 8.dp),
+                    .padding(start = 8.dp, top = 8.dp, end = 8.dp),
             )
 
             if (isPortrait) {
@@ -138,7 +138,7 @@ fun SessionDetailOverlay(
                     translucent = false,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 52.dp, top = 8.dp, end = 8.dp),
+                        .padding(start = 8.dp, top = 8.dp, end = 8.dp),
                 )
                 Column(
                     modifier = Modifier

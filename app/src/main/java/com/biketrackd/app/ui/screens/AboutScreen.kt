@@ -28,9 +28,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.biketrackd.app.R
+import com.biketrackd.app.ui.components.ScreenHeader
 
 @Composable
-fun AboutScreen(modifier: Modifier = Modifier) {
+fun AboutScreen(onMenuClick: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val versionName = remember {
         try {
@@ -38,8 +39,13 @@ fun AboutScreen(modifier: Modifier = Modifier) {
         } catch (e: Exception) { "?" }
     }
 
+    Column(modifier = modifier.fillMaxSize()) {
+        ScreenHeader(
+            title = stringResource(R.string.screen_about),
+            onMenuClick = onMenuClick,
+        )
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -112,5 +118,6 @@ fun AboutScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
+    }
     }
 }

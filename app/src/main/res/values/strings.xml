@@ -11,6 +11,13 @@
     <string name="desc_sidebar_maintenance">MAINT.</string>
     <string name="desc_sidebar_options">SETTINGS</string>
 
+    <!-- Screen headers -->
+    <string name="screen_stats">Statistics</string>
+    <string name="screen_bikes">Bikes</string>
+    <string name="screen_maintenance">Maintenance</string>
+    <string name="screen_settings">Settings</string>
+    <string name="screen_about">About</string>
+
     <!-- StatusBar -->
     <string name="desc_battery">Battery</string>
     <string name="label_gps">GPS:</string>

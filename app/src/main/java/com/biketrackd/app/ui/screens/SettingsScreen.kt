@@ -67,6 +67,7 @@ import com.biketrackd.app.location.LocationRepository
 import com.biketrackd.app.ui.components.CityResult
 import com.biketrackd.app.ui.components.CitySearchDialog
 import com.biketrackd.app.ui.components.DownloadDialog
+import com.biketrackd.app.ui.components.ScreenHeader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -78,7 +79,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun SettingsScreen(modifier: Modifier = Modifier) {
+fun SettingsScreen(onMenuClick: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val dao = remember { AppDatabase.getInstance(context).pedalSessionDao() }
@@ -98,10 +99,15 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     var unitSystem by remember { mutableStateOf(UnitPreferences.get(context)) }
     var orientationPref by remember { mutableStateOf(OrientationPreferences.get(context)) }
 
+    Column(modifier = modifier.fillMaxSize()) {
+        ScreenHeader(
+            title = stringResource(R.string.screen_settings),
+            onMenuClick = onMenuClick,
+        )
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
     ) {
         // === Session controls ===
         item {
@@ -1100,6 +1106,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
+    }
     }
 
     if (showCitySearch) {

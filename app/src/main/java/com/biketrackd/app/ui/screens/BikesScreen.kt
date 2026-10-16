@@ -3,6 +3,7 @@ package com.biketrackd.app.ui.screens
 import android.app.DatePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Row
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.biketrackd.app.R
 import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.Bike
+import com.biketrackd.app.ui.components.ScreenHeader
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -53,7 +55,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun BikesScreen(modifier: Modifier = Modifier) {
+fun BikesScreen(onMenuClick: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val dao = remember { AppDatabase.getInstance(context).bikeDao() }
     val scope = rememberCoroutineScope()
@@ -215,6 +217,12 @@ fun BikesScreen(modifier: Modifier = Modifier) {
     }
 
     Scaffold(
+        topBar = {
+            ScreenHeader(
+                title = stringResource(R.string.screen_bikes),
+                onMenuClick = onMenuClick,
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showDialog = true },
@@ -229,9 +237,8 @@ fun BikesScreen(modifier: Modifier = Modifier) {
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
+            contentPadding = PaddingValues(bottom = 96.dp),
         ) {
-            item { Spacer(modifier = Modifier.height(24.dp)) }
-
             item {
                 Text(
                     text = stringResource(R.string.section_bikes),

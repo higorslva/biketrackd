@@ -15,6 +15,7 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -29,14 +30,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -50,7 +44,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -230,38 +223,22 @@ class MainActivity : ComponentActivity() {
                             Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
                                 when (currentScreen) {
                                     Screen.GPS -> GpsScreen(
+                                        onMenuClick = { showSidebar = true },
                                         showMiniSpeedometer = showMiniSpeedometer,
                                         burnInDimmed = burnInDimmed,
                                     )
                                     Screen.SPEEDOMETER -> SpeedometerScreen(
+                                        onMenuClick = { showSidebar = true },
                                         batteryLevel = batteryLevel,
                                         isBatteryCharging = isBatteryCharging,
                                         wornCritical = wornCritical,
                                     )
-                                    Screen.BIKES -> BikesScreen()
-                                    Screen.MAINTENANCE -> MaintenanceScreen()
-                                    Screen.STATISTICS -> StatsScreen()
-                                    Screen.ABOUT -> AboutScreen()
-                                    Screen.SETTINGS -> SettingsScreen()
+                                    Screen.BIKES -> BikesScreen(onMenuClick = { showSidebar = true })
+                                    Screen.MAINTENANCE -> MaintenanceScreen(onMenuClick = { showSidebar = true })
+                                    Screen.STATISTICS -> StatsScreen(onMenuClick = { showSidebar = true })
+                                    Screen.ABOUT -> AboutScreen(onMenuClick = { showSidebar = true })
+                                    Screen.SETTINGS -> SettingsScreen(onMenuClick = { showSidebar = true })
                                 }
-
-                                Button(
-                                    onClick = { showSidebar = !showSidebar },
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
-                                        contentColor = MaterialTheme.colorScheme.onSurface,
-                                    ),
-                                    modifier = Modifier
-                                        .align(Alignment.TopStart)
-                                        .padding(8.dp),
-                                ) {
-                                    Icon(
-                                        imageVector = if (showSidebar) Icons.Default.Close
-                                            else Icons.Default.Menu,
-                                        contentDescription = stringResource(if (showSidebar) R.string.desc_close_sidebar else R.string.desc_open_sidebar),
-                    )
-                }
 
                 // Bike selector dialog
                 if (showBikeSelector) {
@@ -332,6 +309,9 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+                    if (showSidebar) {
+                        BackHandler { showSidebar = false }
+                    }
                     AnimatedVisibility(
                         visible = showSidebar,
                         enter = slideInHorizontally { -it },

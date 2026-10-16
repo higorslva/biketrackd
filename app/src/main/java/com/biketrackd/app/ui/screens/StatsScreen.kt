@@ -50,6 +50,7 @@ import com.biketrackd.app.data.UnitFormatter
 import com.biketrackd.app.data.UnitPreferences
 import com.biketrackd.app.ui.LocalFontScale
 import com.biketrackd.app.ui.components.LineChart
+import com.biketrackd.app.ui.components.ScreenHeader
 import com.biketrackd.app.ui.components.SessionCard
 import com.biketrackd.app.ui.components.SessionDetailOverlay
 import com.biketrackd.app.ui.components.StatRow
@@ -64,7 +65,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun StatsScreen(modifier: Modifier = Modifier) {
+fun StatsScreen(onMenuClick: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val fontScale = LocalFontScale.current
     val dao = remember { AppDatabase.getInstance(context).pedalSessionDao() }
@@ -150,14 +151,17 @@ fun StatsScreen(modifier: Modifier = Modifier) {
     }
 
     Box(modifier = modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        ScreenHeader(
+            title = stringResource(R.string.screen_stats),
+            onMenuClick = onMenuClick,
+        )
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
     ) {
         // === Stats section ===
-        item { Spacer(modifier = Modifier.height(24.dp)) }
-
         item {
             Text(
                 text = stringResource(R.string.section_stats),
@@ -570,6 +574,7 @@ fun StatsScreen(modifier: Modifier = Modifier) {
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
+    }
     }
 
         val detailSession = viewingSession

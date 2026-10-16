@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
@@ -60,6 +61,7 @@ import com.biketrackd.app.data.AppDatabase
 import com.biketrackd.app.data.MaintenancePart
 import com.biketrackd.app.data.UnitPreferences
 import com.biketrackd.app.data.UnitFormatter
+import com.biketrackd.app.ui.components.ScreenHeader
 import kotlinx.coroutines.launch
 
 private val componentTypes: List<Pair<String, Int>> = listOf(
@@ -91,7 +93,7 @@ private fun wearColor(fraction: Float): Color = when {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MaintenanceScreen(modifier: Modifier = Modifier) {
+fun MaintenanceScreen(onMenuClick: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val db = remember { AppDatabase.getInstance(context) }
     val partDao = remember { db.maintenancePartDao() }
@@ -268,6 +270,12 @@ fun MaintenanceScreen(modifier: Modifier = Modifier) {
     }
 
     Scaffold(
+        topBar = {
+            ScreenHeader(
+                title = stringResource(R.string.screen_maintenance),
+                onMenuClick = onMenuClick,
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showDialog = true },
@@ -285,9 +293,8 @@ fun MaintenanceScreen(modifier: Modifier = Modifier) {
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
+            contentPadding = PaddingValues(bottom = 96.dp),
         ) {
-            item { Spacer(modifier = Modifier.height(24.dp)) }
-
             item {
                 Text(
                     text = stringResource(R.string.section_maintenance),
