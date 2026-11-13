@@ -365,6 +365,9 @@ class MainActivity : ComponentActivity() {
                                                 durationSeconds = summary.durationSeconds,
                                                 trailData = LocationRepository.trailToJson(),
                                                 bikeId = selectedBikeId,
+                                                elevationGain = summary.elevationGain,
+                                                elevationLoss = summary.elevationLoss,
+                                                movingSeconds = summary.movingSeconds,
                                             )
                                         )
                                         selectedBikeId?.let { bikeId ->

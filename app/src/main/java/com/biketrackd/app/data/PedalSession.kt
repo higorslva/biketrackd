@@ -13,6 +13,9 @@ data class PedalSession(
     val durationSeconds: Long,
     val trailData: String? = null,
     val bikeId: Long? = null,
+    val elevationGain: Float? = null,
+    val elevationLoss: Float? = null,
+    val movingSeconds: Long? = null,
 )
 
 data class WeekDist(

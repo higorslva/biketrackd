@@ -267,6 +267,27 @@ private fun SessionStatsCard(
                 stringResource(R.string.stat_duration),
                 formatSessionDuration(session.durationSeconds),
             )
+            session.elevationGain?.let { gain ->
+                Spacer(modifier = Modifier.height(6.dp))
+                StatRow(
+                    stringResource(R.string.stat_elevation_gain),
+                    "${Math.round(gain)} m",
+                )
+            }
+            session.elevationLoss?.let { loss ->
+                Spacer(modifier = Modifier.height(6.dp))
+                StatRow(
+                    stringResource(R.string.stat_elevation_loss),
+                    "${Math.round(loss)} m",
+                )
+            }
+            session.movingSeconds?.let { moving ->
+                Spacer(modifier = Modifier.height(6.dp))
+                StatRow(
+                    stringResource(R.string.stat_moving_time),
+                    "${formatHms(moving)} / ${formatHms(session.durationSeconds)}",
+                )
+            }
             if (bikeName != null) {
                 Spacer(modifier = Modifier.height(6.dp))
                 StatRow(stringResource(R.string.label_bike), bikeName)
@@ -404,4 +425,11 @@ private fun formatSessionDuration(seconds: Long): String {
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60
     return if (hours > 0) "${hours}h ${minutes}min" else "${minutes}min"
+}
+
+private fun formatHms(seconds: Long): String {
+    val h = seconds / 3600
+    val m = (seconds % 3600) / 60
+    val s = seconds % 60
+    return String.format(java.util.Locale.US, "%02d:%02d:%02d", h, m, s)
 }

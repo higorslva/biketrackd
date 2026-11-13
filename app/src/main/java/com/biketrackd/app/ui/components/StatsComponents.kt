@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.biketrackd.app.R
 import com.biketrackd.app.data.GpxExporter
 import com.biketrackd.app.data.PedalSession
+import com.biketrackd.app.data.TrailDataParser
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -139,12 +140,7 @@ fun StatRow(label: String, value: String, subtitle: String? = null) {
 
 fun shareSessionGpx(context: android.content.Context, session: PedalSession) {
     try {
-        val arr = JSONArray(session.trailData ?: return)
-        val points = mutableListOf<Pair<Double, Double>>()
-        for (i in 0 until arr.length()) {
-            val coord = arr.getJSONArray(i)
-            points.add(coord.getDouble(0) to coord.getDouble(1))
-        }
+        val points = TrailDataParser.parse(session.trailData)
         val gpx = GpxExporter.generate(points, session)
         GpxExporter.share(context, gpx, session)
     } catch (_: Exception) {

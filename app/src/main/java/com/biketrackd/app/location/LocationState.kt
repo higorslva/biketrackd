@@ -20,6 +20,8 @@ data class LocationState(
     val originLongitude: Double = 0.0,
     val hasOrigin: Boolean = false,
     val distanceToOrigin: Float = 0f,
+    val elevationGain: Float = 0f,
+    val elevationLoss: Float = 0f,
 )
 
 data class SessionSummary(
@@ -27,4 +29,7 @@ data class SessionSummary(
     val maxSpeed: Float,
     val avgSpeed: Float,
     val durationSeconds: Long,
+    val movingSeconds: Long,
+    val elevationGain: Float,
+    val elevationLoss: Float,
 )

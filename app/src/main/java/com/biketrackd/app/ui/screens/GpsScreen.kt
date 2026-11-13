@@ -111,7 +111,7 @@ fun GpsScreen(onMenuClick: () -> Unit, showMiniSpeedometer: Boolean = false, bur
 
     LaunchedEffect(mapStateRef) {
         val ms = mapStateRef ?: return@LaunchedEffect
-        val coords = trailPoints.map { Point.fromLngLat(it.second, it.first) }
+                        val coords = trailPoints.map { Point.fromLngLat(it.longitude, it.latitude) }
         val trailLineString = if (coords.size >= 2) LineString.fromLngLats(coords) else null
         if (trailLineString != null) {
             ms.style.getSourceAs<GeoJsonSource>("trail")?.setGeoJson(
@@ -322,7 +322,7 @@ fun GpsScreen(onMenuClick: () -> Unit, showMiniSpeedometer: Boolean = false, bur
                     val style = ms.style
 
                     val trailLineString = run {
-                        val coords = trailPoints.map { Point.fromLngLat(it.second, it.first) }
+        val coords = trailPoints.map { Point.fromLngLat(it.longitude, it.latitude) }
                         if (coords.isNotEmpty()) LineString.fromLngLats(coords) else null
                     }
                     if (trailLineString != null) {

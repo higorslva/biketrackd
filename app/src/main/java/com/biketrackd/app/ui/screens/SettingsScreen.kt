@@ -128,6 +128,9 @@ fun SettingsScreen(onMenuClick: () -> Unit, modifier: Modifier = Modifier) {
                                 maxSpeed = state.maxSpeedKmh,
                                 avgSpeed = avgSpeed,
                                 durationSeconds = state.elapsedSeconds,
+                                elevationGain = state.elevationGain,
+                                elevationLoss = state.elevationLoss,
+                                movingSeconds = state.movingSeconds,
                             )
                         )
                         LocationRepository.addToTotalOdometer(state.totalDistanceMeters)

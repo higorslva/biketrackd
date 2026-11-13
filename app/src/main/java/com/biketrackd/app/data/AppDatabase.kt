@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [PedalSession::class, Bike::class, MaintenancePart::class], version = 4, exportSchema = false)
+@Database(entities = [PedalSession::class, Bike::class, MaintenancePart::class], version = 5, exportSchema = true)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun pedalSessionDao(): PedalSessionDao
@@ -54,13 +54,21 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `pedal_history` ADD COLUMN `elevationGain` REAL DEFAULT NULL")
+                db.execSQL("ALTER TABLE `pedal_history` ADD COLUMN `elevationLoss` REAL DEFAULT NULL")
+                db.execSQL("ALTER TABLE `pedal_history` ADD COLUMN `movingSeconds` INTEGER DEFAULT NULL")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "gpsoss.db"
-                ).addMigrations(MIGRATION_2_3, MIGRATION_3_4).build().also { INSTANCE = it }
+                ).addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5).build().also { INSTANCE = it }
             }
         }
     }

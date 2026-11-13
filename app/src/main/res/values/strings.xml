@@ -69,6 +69,9 @@
     <string name="stat_avg_distance">Avg Distance / Session</string>
     <string name="stat_avg_time">Avg Time / Session</string>
     <string name="stat_duration">Duration</string>
+    <string name="stat_elevation_gain">Elevation gain</string>
+    <string name="stat_elevation_loss">Elevation loss</string>
+    <string name="stat_moving_time">Moving / total time</string>
     <string name="section_this_month">This Month</string>
     <string name="section_best_session">Best Session</string>
     <string name="btn_export_all">Export All</string>

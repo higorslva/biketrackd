@@ -3,6 +3,7 @@ package com.biketrackd.app.location
 import android.content.Context
 import android.location.Location
 import android.os.Build
+import com.biketrackd.app.data.TrailPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,6 +14,7 @@ object LocationRepository {
     private const val SPEED_THRESHOLD = 1.5f
     private const val TRAIL_MIN_DISTANCE = 10f
     private const val MIN_MOVING_SPEED = 3.0f
+    private const val ELEVATION_THRESHOLD = 2.5f
     private const val PREFS_NAME = "biketrackd_prefs"
     private const val KEY_TOTAL_ODOMETER = "total_odometer_meters"
     private const val KEY_MAX_SPEED_ARC = "max_speed_arc"
@@ -23,11 +25,12 @@ object LocationRepository {
     private val _maxSpeedArc = MutableStateFlow(80f)
     val maxSpeedArc: StateFlow<Float> = _maxSpeedArc.asStateFlow()
 
-    private val _trailPoints = mutableListOf<Pair<Double, Double>>()
-    val trailPoints: List<Pair<Double, Double>> get() = _trailPoints.toList()
+    private val _trailPoints = mutableListOf<TrailPoint>()
+    val trailPoints: List<TrailPoint> get() = _trailPoints.toList()
 
     private var previousLocation: Location? = null
     private var previousAltitude: Double = 0.0
+    private var elevationReference: Double? = null
     private var previousDistanceForAltitude: Float = 0f
     private var sessionStartTime: Long = 0L
     private var smoothedSpeed = 0f
@@ -49,6 +52,8 @@ object LocationRepository {
         _trailPoints.clear()
         trailAccumulator = 0f
         previousLocation = null
+        previousAltitude = 0.0
+        elevationReference = null
         sessionStartTime = System.currentTimeMillis()
         lastMovingSecond = 0L
         smoothedSpeed = 0f
@@ -62,6 +67,8 @@ object LocationRepository {
             maxSpeedKmh = 0f,
             rawSpeedKmh = 0f,
             hasOrigin = false,
+            elevationGain = 0f,
+            elevationLoss = 0f,
         )
     }
 
@@ -75,6 +82,9 @@ object LocationRepository {
             maxSpeed = current.maxSpeedKmh,
             avgSpeed = avgSpeed,
             durationSeconds = current.elapsedSeconds,
+            movingSeconds = current.movingSeconds,
+            elevationGain = current.elevationGain,
+            elevationLoss = current.elevationLoss,
         )
     }
 
@@ -117,6 +127,25 @@ object LocationRepository {
         previousAltitude = altitude
         previousDistanceForAltitude += distanceDelta
 
+        // Elevation gain/loss with hysteresis (filters GPS noise)
+        var elevationGain = current.elevationGain
+        var elevationLoss = current.elevationLoss
+        if (current.isSessionActive && location.hasAltitude()) {
+            val reference = elevationReference
+            if (reference == null) {
+                elevationReference = altitude
+            } else {
+                val delta = altitude - reference
+                if (delta >= ELEVATION_THRESHOLD) {
+                    elevationGain += delta.toFloat()
+                    elevationReference = altitude
+                } else if (-delta >= ELEVATION_THRESHOLD) {
+                    elevationLoss += (-delta).toFloat()
+                    elevationReference = altitude
+                }
+            }
+        }
+
         val bearing = if (rawSpeed > SPEED_THRESHOLD) {
             if (location.hasBearing()) location.bearing
             else if (prevLocation != null) prevLocation.bearingTo(location)
@@ -137,6 +166,8 @@ object LocationRepository {
             altitude = if (isSlowTick) altitude else current.altitude,
             bearing = bearing,
             slope = if (isSlowTick) slope else current.slope,
+            elevationGain = elevationGain,
+            elevationLoss = elevationLoss,
         )
 
         if (isSlowTick) lastSlowUpdate = now
@@ -152,11 +183,11 @@ object LocationRepository {
             }
 
             if (_trailPoints.isEmpty()) {
-                _trailPoints.add(Pair(location.latitude, location.longitude))
+                _trailPoints.add(trailPoint(location))
             } else {
                 trailAccumulator += distanceDelta
                 if (trailAccumulator >= TRAIL_MIN_DISTANCE) {
-                    _trailPoints.add(Pair(location.latitude, location.longitude))
+                    _trailPoints.add(trailPoint(location))
                     trailAccumulator -= TRAIL_MIN_DISTANCE
                 }
             }
@@ -206,11 +237,19 @@ object LocationRepository {
     }
 
     fun trailToJson(): String {
-        val coords = _trailPoints.joinToString(",") { (lat, lon) ->
-            "[$lat,$lon]"
+        val coords = _trailPoints.joinToString(",") { point ->
+            val altitude = point.altitude?.toString() ?: "null"
+            "[${point.latitude},${point.longitude},$altitude,${point.timestamp}]"
         }
         return "[$coords]"
     }
+
+    private fun trailPoint(location: Location) = TrailPoint(
+        latitude = location.latitude,
+        longitude = location.longitude,
+        altitude = if (location.hasAltitude()) location.altitude else null,
+        timestamp = System.currentTimeMillis(),
+    )
 
     fun resetSession() {
         _trailPoints.clear()
@@ -226,8 +265,12 @@ object LocationRepository {
             resetCount = _state.value.resetCount + 1,
             hasOrigin = false,
             distanceToOrigin = 0f,
+            elevationGain = 0f,
+            elevationLoss = 0f,
         )
         previousLocation = null
+        previousAltitude = 0.0
+        elevationReference = null
         sessionStartTime = 0L
         smoothedSpeed = 0f
     }

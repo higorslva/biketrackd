@@ -1,0 +1,234 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "211ceae18f8f0e2a348f2758e2758f4c",
+    "entities": [
+      {
+        "tableName": "pedal_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER NOT NULL, `totalDistance` REAL NOT NULL, `maxSpeed` REAL NOT NULL, `avgSpeed` REAL NOT NULL, `durationSeconds` INTEGER NOT NULL, `trailData` TEXT, `bikeId` INTEGER, `elevationGain` REAL, `elevationLoss` REAL, `movingSeconds` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalDistance",
+            "columnName": "totalDistance",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "maxSpeed",
+            "columnName": "maxSpeed",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avgSpeed",
+            "columnName": "avgSpeed",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "durationSeconds",
+            "columnName": "durationSeconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trailData",
+            "columnName": "trailData",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bikeId",
+            "columnName": "bikeId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "elevationGain",
+            "columnName": "elevationGain",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "elevationLoss",
+            "columnName": "elevationLoss",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "movingSeconds",
+            "columnName": "movingSeconds",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "bike",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `model` TEXT NOT NULL, `type` TEXT NOT NULL, `acquisitionDate` INTEGER NOT NULL, `notes` TEXT NOT NULL, `isDefault` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "model",
+            "columnName": "model",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "acquisitionDate",
+            "columnName": "acquisitionDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDefault",
+            "columnName": "isDefault",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "maintenance_part",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `bikeId` INTEGER NOT NULL, `name` TEXT NOT NULL, `componentType` TEXT NOT NULL, `lifespanKm` REAL NOT NULL, `usedKm` REAL NOT NULL, `installDate` INTEGER NOT NULL, `notes` TEXT NOT NULL, FOREIGN KEY(`bikeId`) REFERENCES `bike`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bikeId",
+            "columnName": "bikeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "componentType",
+            "columnName": "componentType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lifespanKm",
+            "columnName": "lifespanKm",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usedKm",
+            "columnName": "usedKm",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "installDate",
+            "columnName": "installDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_maintenance_part_bikeId",
+            "unique": false,
+            "columnNames": [
+              "bikeId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_maintenance_part_bikeId` ON `${TABLE_NAME}` (`bikeId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "bike",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "bikeId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '211ceae18f8f0e2a348f2758e2758f4c')"
+    ]
+  }
+}
