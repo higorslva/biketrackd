@@ -91,7 +91,7 @@ A cycling speedometer and GPS tracker for Android. Built with Jetpack Compose + 
 
 | Indicator | Color | Meaning |
 |-----------|-------|---------|
-| **BAT** | Green / Amber / Red | Battery ≥40% / 16–40% / ≤15% (blinking + warning icon) |
+| **BAT** | Green / Amber / Red | Battery >40% / 16–40% / ≤15% (blinking + warning icon) |
 | **ENG** | Green / Amber | Session active / Moving without an active session |
 | **GPS** | Green / Yellow / Red | Position fix acquired / Stationary (<3 km/h) / No fix (blinking) |
 | **TMP** | Green / Amber / Red | Normal / Warm / Moderate, hot or critical (blinking + warning icon) |
